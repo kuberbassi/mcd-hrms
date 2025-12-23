@@ -1,37 +1,144 @@
-/* My Styles */
+/* Global Styles */
+:root {
+  --primary: #1a237e;
+  --secondary: #ff9933;
+  --bg-color: #f8f9fa;
+}
 
 body {
-  background-color: #f0f2f5;
-  font-family: sans-serif;
-  padding: 20px;
+  margin: 0;
+  padding: 0;
+  background-color: var(--bg-color);
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
-.card {
-  background: white;
-  padding: 20px;
-  border-radius: 10px;
-  box-shadow: 0px 2px 5px grey;
-  margin-bottom: 20px;
+/* Utilities */
+.ls-1 {
+  letter-spacing: 1px;
 }
 
-.my-btn {
-  padding: 10px 20px;
-  border: none;
-  border-radius: 5px;
-  cursor: pointer;
+.ls-2 {
+  letter-spacing: 2px;
 }
 
-.blue-btn {
-  background: #007bff;
-  color: white;
+.backdrop-blur {
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
 }
 
-.red-btn {
-  background: #dc3545;
-  color: white;
+.group-hover-effect {
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
 
-.green-btn {
-  background: #28a745;
-  color: white;
+.group-hover-effect:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1) !important;
+}
+
+/* Scrollbar Polish */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #94a3b8;
+}
+
+/* Animations - Smooth & Subtle */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-fade-in {
+  animation: fadeIn 0.5s ease-out forwards;
+}
+
+.animate-slide-up {
+  animation: slideUp 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.hover-scale {
+  transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275), box-shadow 0.2s ease;
+}
+
+.hover-scale:hover {
+  transform: translateY(-4px) scale(1.01);
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.08) !important;
+}
+
+.btn-hover-effect {
+  transition: all 0.2s ease;
+}
+
+.btn-hover-effect:active {
+  transform: scale(0.95);
+}
+
+/* Mobile Optimizations */
+@media (max-width: 768px) {
+  body {
+    font-size: 14px;
+    /* Slightly smaller base font */
+  }
+
+  .container {
+    padding-left: 15px !important;
+    padding-right: 15px !important;
+  }
+
+  .navbar-brand {
+    font-size: 0.9rem !important;
+  }
+
+  .display-4 {
+    font-size: 2.5rem;
+    /* Smaller big numbers */
+  }
+
+  .display-5 {
+    font-size: 2rem;
+  }
+
+  .card-body {
+    padding: 1.25rem !important;
+    /* Reduce padding inside cards */
+  }
+
+  /* Make tabs scrollable nicely */
+  .overflow-auto {
+    -webkit-overflow-scrolling: touch;
+    padding-bottom: 5px;
+  }
 }
