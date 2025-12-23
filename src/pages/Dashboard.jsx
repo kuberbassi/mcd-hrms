@@ -258,7 +258,7 @@ function Dashboard({ role, user, setTab }) {
                 <div className="col-md-7">
                     <div className="row g-3 h-100">
                         <div className="col-md-4">
-                            <div className="p-4 rounded-4 border-0 text-center bg-white shadow-sm h-100 position-relative overflow-hidden group-hover-effect">
+                            <div className="p-4 rounded-4 border-0 text-center bg-white shadow-sm h-100 position-relative overflow-hidden">
                                 <div className="position-absolute top-0 start-0 w-100 h-1 bg-success"></div>
                                 <div className="mb-3 text-success p-3 rounded-circle bg-success bg-opacity-10 d-inline-block">
                                     <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
@@ -294,6 +294,18 @@ function Dashboard({ role, user, setTab }) {
                                     <div className="text-white rounded-circle p-2 d-flex align-items-center justify-content-center fw-bold fs-4" style={{ width: "50px", height: "50px", backgroundColor: THEME.primary }}>
                                         {user?.email?.charAt(0).toUpperCase()}
                                     </div>
+                                    <div className="ms-3">
+                                        <div className="fw-bold text-dark">{user?.email}</div>
+                                        <div className="small text-muted">Authenticated User • Active Employee</div>
+                                    </div>
+                                </div>
+                                <div className="d-none d-md-block">
+                                    <button
+                                        className="btn btn-sm btn-outline-primary rounded-pill px-3"
+                                        onClick={() => setShowProfile(true)}
+                                    >
+                                        View Profile
+                                    </button>
                                 </div>
                             </div>
                         </div>
