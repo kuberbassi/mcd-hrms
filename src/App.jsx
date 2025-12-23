@@ -6,7 +6,6 @@ import {
   checkUser,
 } from "./backend";
 
-// Import all pages
 import Dashboard from "./pages/Dashboard";
 import Employees from "./pages/Employees";
 import Attendance from "./pages/Attendance";
@@ -14,16 +13,14 @@ import Transfers from "./pages/Transfers";
 import Payroll from "./pages/Payroll";
 import Performance from "./pages/Performance";
 import Grievances from "./pages/Grievances";
-
 import Settings from "./pages/Settings";
 
-// Theme Colors
 const THEME = {
-  primary: "#1a237e", // Deep Navy Blue
-  secondary: "#ff9933", // Saffron Orange
-  success: "#138808", // India Green
-  bg: "#f8f9fa", // Clean Off-White
-  text: "#333333", // Dark Grey
+  primary: "#1a237e",
+  secondary: "#ff9933",
+  success: "#138808",
+  bg: "#f8f9fa",
+  text: "#333333",
 };
 
 function App() {
@@ -31,8 +28,8 @@ function App() {
   const [user, setUser] = useState(null);
   const [role, setRole] = useState("employee");
   const [activeTab, setActiveTab] = useState("dashboard");
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
-  // Check if user is logged in
   useEffect(() => {
     const unsubscribe = checkUser((currentUser, userRole) => {
       setUser(currentUser);
@@ -45,7 +42,6 @@ function App() {
     };
   }, []);
 
-  // Handle login form submit
   async function handleLogin(e) {
     e.preventDefault();
     const email = e.target.email.value;
@@ -59,7 +55,6 @@ function App() {
     }
   }
 
-  // Handle logout
   async function handleLogout() {
     try {
       await firebaseLogout();
@@ -68,99 +63,154 @@ function App() {
     }
   }
 
-  // Get tabs based on role
   function getTabs() {
-    const tabs = [{ id: "dashboard", label: "Dashboard", icon: "dashboard" }];
+    const tabs = [{ id: "dashboard", label: "Dashboard", icon: "🏠" }];
 
     if (role === "admin" || role === "hr") {
-      tabs.push({ id: "employees", label: "Employees", icon: "employees" });
-      tabs.push({ id: "attendance", label: "Attendance", icon: "attendance" });
+      tabs.push({ id: "employees", label: "Employees", icon: "👥" });
+      tabs.push({ id: "attendance", label: "Attendance", icon: "✓" });
     } else {
-      tabs.push({ id: "attendance", label: "My Attendance", icon: "attendance" });
+      tabs.push({ id: "attendance", label: "My Attendance", icon: "✓" });
     }
 
-    // Payroll access
     if (role === "admin") {
-      tabs.push({ id: "payroll", label: "Payroll", icon: "payroll" });
+      tabs.push({ id: "payroll", label: "Payroll", icon: "💰" });
     } else {
-      tabs.push({ id: "payroll", label: "My Salary", icon: "payroll" });
+      tabs.push({ id: "payroll", label: "My Salary", icon: "💰" });
     }
 
     if (role === "admin") {
-      tabs.push({ id: "performance", label: "Performance", icon: "performance" });
+      tabs.push({ id: "performance", label: "Performance", icon: "📊" });
     }
 
-    // Transfers & Grievances
-    tabs.push({ id: "transfers", label: role === "admin" ? "Transfers" : "Transfer Request", icon: "transfers" });
-    tabs.push({ id: "grievances", label: role === "admin" ? "Grievances" : "Submit Complaint", icon: "grievances" });
+    tabs.push({ id: "transfers", label: role === "admin" ? "Transfers" : "Transfer Request", icon: "📋" });
+    tabs.push({ id: "grievances", label: role === "admin" ? "Grievances" : "Submit Complaint", icon: "💬" });
 
-    // Settings (Admin Only)
     if (role === "admin") {
-      tabs.push({ id: "settings", label: "Settings", icon: "settings" });
+      tabs.push({ id: "settings", label: "Settings", icon: "⚙️" });
     }
 
     return tabs;
   }
 
-  // Login Page with Govt Theme
+  function switchTab(tabId) {
+    setActiveTab(tabId);
+    setMobileMenuOpen(false);
+  }
+
+  function renderPage() {
+    switch (activeTab) {
+      case "dashboard":
+        return <Dashboard role={role} user={user} setTab={setActiveTab} />;
+      case "employees":
+        return <Employees role={role} />;
+      case "attendance":
+        return <Attendance role={role} user={user} />;
+      case "payroll":
+        return <Payroll role={role} user={user} />;
+      case "transfers":
+        return <Transfers role={role} user={user} />;
+      case "performance":
+        return <Performance role={role} />;
+      case "grievances":
+        return <Grievances role={role} user={user} />;
+      case "settings":
+        return <Settings />;
+      default:
+        return <Dashboard role={role} user={user} setTab={setActiveTab} />;
+    }
+  }
+
   if (!isLoggedIn) {
     return (
-      <div className="min-vh-100 d-flex align-items-center justify-content-center" style={{ backgroundColor: THEME.primary }}>
-        <div className="card p-5 shadow-lg border-0" style={{ maxWidth: "420px", borderRadius: "10px", boxShadow: "0 10px 30px rgba(0,0,0,0.2)" }}>
-          <div className="text-center mb-4">
-            {/* Simple Logo Placeholder */}
-            <div className="mb-3 d-inline-block bg-light rounded-circle p-3">
-              <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke={THEME.primary} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5" /></svg>
+      <div className="min-vh-100 d-flex align-items-center justify-content-center" style={{ background: `linear-gradient(135deg, ${THEME.primary} 0%, #283593 100%)` }}>
+        <div className="container">
+          <div className="row justify-content-center">
+            <div className="col-11 col-sm-10 col-md-8 col-lg-5">
+              <div className="card border-0 shadow-lg rounded-4 overflow-hidden">
+                <div className="card-body p-4 p-md-5">
+                  <div className="text-center mb-4">
+                    <div className="bg-primary text-white rounded-circle d-inline-flex align-items-center justify-content-center mb-3" style={{ width: "60px", height: "60px", fontSize: "1.5rem" }}>M</div>
+                    <h4 className="fw-bold mb-1">MCD HRMS</h4>
+                    <p className="text-muted small mb-0">Municipal Corporation of Delhi</p>
+                  </div>
+                  <form onSubmit={handleLogin}>
+                    <div className="mb-3">
+                      <label className="form-label small fw-bold text-muted">Email</label>
+                      <input type="email" name="email" className="form-control form-control-lg" placeholder="Enter your email" required />
+                    </div>
+                    <div className="mb-4">
+                      <label className="form-label small fw-bold text-muted">Password</label>
+                      <input type="password" name="password" className="form-control form-control-lg" placeholder="Enter password" required />
+                    </div>
+                    <button type="submit" className="btn btn-primary btn-lg w-100 fw-bold">Sign In</button>
+                  </form>
+                </div>
+              </div>
             </div>
-            <h3 className="fw-bold mb-1" style={{ color: THEME.primary }}>MCD HRMS</h3>
-            <p className="text-muted small">Municipal Corporation of Delhi</p>
-          </div>
-
-          <form onSubmit={handleLogin}>
-            <div className="mb-3">
-              <label className="form-label small fw-bold text-muted">EMAIL OR USERNAME</label>
-              <input
-                type="email"
-                name="email"
-                className="form-control form-control-lg bg-light border-0"
-                placeholder="name@mcd.gov.in"
-                required
-                style={{ borderRadius: "5px" }}
-              />
-            </div>
-            <div className="mb-4">
-              <label className="form-label small fw-bold text-muted">PASSWORD</label>
-              <input
-                type="password"
-                name="password"
-                className="form-control form-control-lg bg-light border-0"
-                placeholder="••••••••"
-                required
-                style={{ borderRadius: "5px" }}
-              />
-            </div>
-            <button className="btn btn-lg w-100 fw-bold text-white shadow-sm" style={{ backgroundColor: THEME.secondary, borderRadius: "5px", letterSpacing: "1px" }}>
-              SIGN IN
-            </button>
-          </form>
-
-          <div className="text-center mt-4">
-            <span className="badge bg-light text-muted fw-normal px-3 py-2">
-              Official Government Portal
-            </span>
           </div>
         </div>
       </div>
     );
   }
 
-  // Main App with Govt Theme
   const tabs = getTabs();
 
   return (
-    <div className="min-vh-100" style={{ backgroundColor: THEME.bg }}>
-      {/* Top Header - Deep Blue */}
-      <nav className="navbar navbar-expand-lg navbar-dark shadow-sm py-3" style={{ backgroundColor: THEME.primary }}>
+    <div className="min-vh-100" style={{ backgroundColor: THEME.bg, paddingBottom: "80px" }}>
+      {/* Mobile Header with Hamburger */}
+      <nav className="navbar navbar-dark shadow-sm sticky-top d-md-none" style={{ backgroundColor: THEME.primary }}>
+        <div className="container-fluid px-3">
+          <button className="btn btn-link text-white p-0" onClick={() => setMobileMenuOpen(!mobileMenuOpen)}>
+            <svg width="24" height="24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <line x1="3" y1="12" x2="21" y2="12"></line>
+              <line x1="3" y1="6" x2="21" y2="6"></line>
+              <line x1="3" y1="18" x2="21" y2="18"></line>
+            </svg>
+          </button>
+          <span className="navbar-brand mb-0 fw-bold">MCD HRMS</span>
+          <button className="btn btn-sm btn-outline-light border-0" onClick={handleLogout}>
+            <svg width="18" height="18" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
+              <polyline points="16 17 21 12 16 7"></polyline>
+              <line x1="21" y1="12" x2="9" y2="12"></line>
+            </svg>
+          </button>
+        </div>
+      </nav>
+
+      {/* Mobile Slide-out Menu */}
+      {mobileMenuOpen && (
+        <>
+          <div className="position-fixed top-0 start-0 w-100 h-100 bg-dark bg-opacity-50 d-md-none" style={{ zIndex: 1040 }} onClick={() => setMobileMenuOpen(false)}></div>
+          <div className="position-fixed top-0 start-0 h-100 bg-white shadow-lg d-md-none" style={{ width: "280px", zIndex: 1050, overflowY: "auto" }}>
+            <div className="p-4" style={{ backgroundColor: THEME.primary }}>
+              <div className="d-flex justify-content-between align-items-center mb-3">
+                <h5 className="text-white mb-0 fw-bold">Menu</h5>
+                <button className="btn btn-link text-white p-0" onClick={() => setMobileMenuOpen(false)}>✕</button>
+              </div>
+              <div className="text-white-50 small">{user?.email}</div>
+              <div className="badge bg-white text-primary mt-2">{role === "admin" ? "ADMIN" : role === "hr" ? "HR" : "EMPLOYEE"}</div>
+            </div>
+            <div className="list-group list-group-flush">
+              {tabs.map((tab) => (
+                <button
+                  key={tab.id}
+                  className={`list-group-item list-group-item-action border-0 py-3 d-flex align-items-center ${activeTab === tab.id ? "active" : ""}`}
+                  onClick={() => switchTab(tab.id)}
+                  style={{ backgroundColor: activeTab === tab.id ? THEME.primary : "transparent", color: activeTab === tab.id ? "white" : THEME.text }}
+                >
+                  <span className="me-3" style={{ fontSize: "1.2rem" }}>{tab.icon}</span>
+                  <span className="fw-medium">{tab.label}</span>
+                </button>
+              ))}
+            </div>
+          </div>
+        </>
+      )}
+
+      {/* Desktop Header */}
+      <nav className="navbar navbar-expand-lg navbar-dark shadow-sm py-3 d-none d-md-flex" style={{ backgroundColor: THEME.primary }}>
         <div className="container px-4">
           <span className="navbar-brand d-flex align-items-center fw-bold">
             <div className="bg-white text-primary rounded-circle d-flex align-items-center justify-content-center me-3" style={{ width: "35px", height: "35px" }}>
@@ -172,7 +222,7 @@ function App() {
             </div>
           </span>
           <div className="d-flex align-items-center gap-4">
-            <div className="text-end d-none d-md-block">
+            <div className="text-end">
               <div className="text-white fw-medium small mb-0">{user?.email}</div>
               <div className="badge bg-white text-dark small" style={{ fontSize: "0.6rem", padding: "3px 8px" }}>
                 {role === "admin" ? "ADMINISTRATOR" : role === "hr" ? "HR MANAGER" : "EMPLOYEE"}
@@ -185,8 +235,8 @@ function App() {
         </div>
       </nav>
 
-      {/* Tab Navigation - Pill Style */}
-      <div className="bg-white border-bottom shadow-sm sticky-top animate-fade-in" style={{ animationDelay: "0.1s" }}>
+      {/* Desktop Tab Navigation */}
+      <div className="bg-white border-bottom shadow-sm sticky-top d-none d-md-block">
         <div className="container px-4 py-2">
           <div className="d-flex overflow-auto gap-2" style={{ scrollbarWidth: "none" }}>
             {tabs.map((tab) => (
@@ -207,24 +257,31 @@ function App() {
       </div>
 
       {/* Page Content */}
-      <div className="container px-3 px-md-4 py-4 py-md-5 animate-fade-in" style={{ animationDelay: "0.2s" }}>
-        {activeTab === "dashboard" && <Dashboard role={role} user={user} setTab={setActiveTab} />}
-        {activeTab === "employees" && (role === "admin" || role === "hr") && <Employees role={role} user={user} />}
-        {activeTab === "attendance" && <Attendance role={role} user={user} />}
-        {activeTab === "payroll" && <Payroll role={role} user={user} />}
-        {activeTab === "performance" && role === "admin" && <Performance role={role} />}
-        {activeTab === "transfers" && <Transfers role={role} user={user} />}
-        {activeTab === "grievances" && <Grievances role={role} user={user} />}
-        {activeTab === "settings" && role === "admin" && <Settings />}
+      <div className="container px-3 px-md-4 py-3 py-md-5">
+        {renderPage()}
       </div>
 
-      {/* Footer */}
-      <footer className="py-4 text-center text-white" style={{ backgroundColor: "#263238" }}>
-        <div className="container">
-          <p className="mb-0 small opacity-75">© 2025 Municipal Corporation of Delhi • Government of India</p>
-          <p className="mb-0 small opacity-50" style={{ fontSize: "0.7rem" }}>Designed & Developed for Internal Management</p>
+      {/* Mobile Bottom Navigation */}
+      <div className="fixed-bottom bg-white border-top shadow d-md-none" style={{ zIndex: 1000 }}>
+        <div className="d-flex justify-content-around py-2">
+          {tabs.slice(0, 4).map((tab) => (
+            <button
+              key={tab.id}
+              className="btn btn-link text-decoration-none flex-fill p-2"
+              onClick={() => switchTab(tab.id)}
+              style={{
+                color: activeTab === tab.id ? THEME.primary : "#adb5bd",
+                borderBottom: activeTab === tab.id ? `3px solid ${THEME.primary}` : "3px solid transparent"
+              }}
+            >
+              <div className="d-flex flex-column align-items-center">
+                <span style={{ fontSize: "1.3rem" }}>{tab.icon}</span>
+                <span style={{ fontSize: "0.65rem", marginTop: "2px" }}>{tab.label.split(" ")[0]}</span>
+              </div>
+            </button>
+          ))}
         </div>
-      </footer>
+      </div>
     </div>
   );
 }
