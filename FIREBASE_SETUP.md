@@ -1,30 +1,26 @@
-# My Firebase Setup Guide
+# My Firebase Setup (Step-by-Step)
 
-I have already put the code in `src/firebase.js`, but you still need to do a few things in the **Firebase Console** (website). 
+I already wrote the code for this, but you need to click a few buttons on the Firebase website to make it work.
 
-Follow these simple steps:
+### 1. Let people log in
+- Go to **Authentication** on the left menu.
+- Click the blue **Get Started** button.
+- Go to the **Sign-in method** tab.
+- Click on **Email/Password** and turn it on.
+- Hit **Save**. 
 
-## 1. Authentication (Login)
-- Go to the **Authentication** tab on the left.
-- Click **Get Started**.
-- Go to **Sign-in method**.
-- Click **Email/Password** and click **Enable**.
-- Click **Save**.
-- *Now the login will work!*
-
-## 2. Firestore Database
-- Go to the **Firestore Database** tab on the left.
+### 2. Setup the Database
+- Go to **Firestore Database** on the left.
 - Click **Create Database**.
-- Select **Location** (Delhi or Mumbai is best).
-- Start in **Test Mode** for now (we already have rules in `firestore.rules` for later).
-- Click **Create**.
+- Pick any city near you (Mumbai or Delhi is good).
+- Choose **Test Mode** so we can start fast.
+- Hit **Create**.
 
-## 3. Deployment (How to put it online)
-If you want to put your website online, follow these steps in my terminal:
-1. Type `npm install -g firebase-tools` (only if you haven't done it).
-2. Type `firebase login` (to sign in to your account).
-3. Type `npm run build` (**IMPORTANT**: This makes my code ready for the internet).
-4. Type `firebase deploy` (to push my code to the web).
+### 3. Put our site online
+When you want to show the site to others, run these in the terminal:
+1. `npm install -g firebase-tools` (Run this only once).
+2. `firebase login` (Log in with your Gmail).
+3. `npm run build` (This fixes the code for the web).
+4. `firebase deploy` (This uploads it).
 
----
-If you see any error in the console about "Permission Denied", tell me!
+If anything goes wrong, just ask me!

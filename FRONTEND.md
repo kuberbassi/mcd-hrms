@@ -1,21 +1,23 @@
-# What Frontend Team should do
+# What Bhaskar and Smarth should do
 
-Bhaskar and Smarth, please follow these simple steps.
+Please follow this simple plan to build the website pages.
 
-## Main Pages to make:
+## Main Pages:
 1. **Login Page**:
-   - Give 2 boxes (Email and Password).
-   - Give 1 button (Login).
-   - Use `login(email, password)` from `backend.js`.
+   - Make two boxes for Email and Password.
+   - Make a "Login" button.
+   - Use my `login(email, password)` function.
 
 2. **Dashboard Page**:
-   - Needs a Logout button at top.
-   - Needs 4 boxes to add new staff (Name, Dept, ID, Post).
-   - Needs a button to "Add Staff". Use `addStaff()` function.
-   - Needs a Table to show all staff. Use `showStaff()` function.
-   - Each row should have a "Delete" button.
+   - Put a "Logout" button at the top.
+   - Make 4 input boxes to add new staff: Name, Dept, ID, and Post.
+   - Make an "Add Staff" button and use my `addStaff()` function.
+   - Make a Table to show all staff. Use my `showStaff()` function.
+   - Put a "Delete" button on every row and use my `removeStaff()` function.
 
-## Important things:
-- Don't make new folders, keep it simple.
-- Use `App.jsx` to show either Login or Dashboard.
-- Use Bootstrap classes for buttons and boxes.
+## Important:
+- Keep it simple, don't create many folders.
+- Use `App.jsx` to switch between Login and Dashboard.
+- Use Bootstrap classes to make buttons and boxes look good.
+
+Ask me if you get stuck!

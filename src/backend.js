@@ -15,23 +15,23 @@ import {
 } from "firebase/firestore";
 import { auth, db } from "./firebase";
 
-// This is for logging in
+// Log in function for the admin
 export async function login(email, password) {
     const user = await signInWithEmailAndPassword(auth, email, password);
     return user;
 }
 
-// This is for logging out
+// Log out function
 export async function logout() {
     await signOut(auth);
 }
 
-// Check if someone is logged in
+// This checks if we are logged in or not
 export function checkUser(callback) {
     onAuthStateChanged(auth, callback);
 }
 
-// Add a new staff member
+// My code to add a new staff member to the database
 export async function addStaff(name, dept, id, post) {
     await addDoc(collection(db, "employees"), {
         name: name,
@@ -42,7 +42,7 @@ export async function addStaff(name, dept, id, post) {
     });
 }
 
-// Show all staff and update automatically
+// This shows all staff and refreshes the list automatically
 export function showStaff(callback) {
     const q = query(collection(db, "employees"), orderBy("time", "desc"));
     onSnapshot(q, (snapshot) => {
@@ -54,14 +54,14 @@ export function showStaff(callback) {
     });
 }
 
-// Remove staff member
+// Function to delete a staff member
 export async function removeStaff(id) {
     await deleteDoc(doc(db, "employees", id));
 }
 
-// My dummy data for testing
+// I made this fake data to test the app fast
 export async function makeFakeData() {
     await addStaff("Raj Kumar", "IT", "101", "Boss");
     await addStaff("Sonia", "HR", "102", "Manager");
-    alert("Fake data added!");
+    alert("I added the fake data!");
 }
