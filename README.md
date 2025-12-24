@@ -1,92 +1,58 @@
 # MCD HRMS
 
-A modern Human Resource Management System for the Municipal Corporation of Delhi. Built with **React**, **Vite**, and **Firebase**.
+A modern Employee Management System built for the Municipal Corporation of Delhi.
 
-## Features
+## 🚀 Features
 
-### For Employees
-- View attendance stats, salary, and profile info
-- Mark daily attendance
-- Submit transfer requests
-- File grievances and track status
+- **Employee Dashboard**: View attendance, salary, and profile.
+- **HR Tools**: Manage employees, mark attendance, and view analytics.
+- **Admin Control**: Full system access and configuration.
 
-### For HR Managers
-- Access employee directory with search
-- Mark attendance for staff
-- View department analytics
-- Permissions configurable by Admin
+## 🛠️ Getting Started
 
-### For Administrators
-- Complete system control
-- Manage employee accounts (add, edit, delete)
-- Configure HR permissions via Settings
-- Track performance and payroll
-- Real-time dashboard with stats
+### 1. Prerequisites
+- [Node.js](https://nodejs.org/) (Download the LTS version)
+- A code editor like VS Code
 
-## Quick Start
+### 2. Setup (for Beginners)
+1. **Clone the project**:
+   ```bash
+   git clone <repository-url>
+   cd mcd-hrms
+   ```
 
-### Prerequisites
-- Node.js v18+
-- npm
+2. **Install dependencies**:
+   ```bash
+   npm install
+   ```
 
-### Installation
-```bash
-git clone <repository-url>
-cd mcd-hrms
-npm install
-npm run dev
-```
+3. **Configure Environment Variables**:
+   - Create a file named `.env` in the project root.
+   - Add your Firebase configuration keys (ask the project lead for these keys).
 
-Open [http://localhost:5173](http://localhost:5173)
+4. **Start the app**:
+   ```bash
+   npm run dev
+   ```
+   Open the link shown in the terminal (usually `http://localhost:5173`).
 
-## Admin Access
+## ☁️ Deployment
 
-1. Sign in to create your profile in Firestore
-2. Go to **Firebase Console** → **Firestore Database**
-3. Find `users` collection → locate your email
-4. Change `role` from `"employee"` to `"admin"`
-5. Refresh the app
+This project is deployed on **Firebase**.
 
-## Demo Accounts
+To deploy updates:
+1. Build the project:
+   ```bash
+   npm run build
+   ```
+2. Deploy to Firebase:
+   ```bash
+   npm install -g firebase-tools
+   firebase login
+   firebase deploy
+   ```
 
-Admins can generate demo accounts via the **"Demo Data"** button.  
-Password for all demo accounts: `demo123`
-
-| Email            | Department |
-|------------------|------------|
-| raj@mcd.in       | IT         |
-| sonia@mcd.in     | HR         |
-| amit@mcd.in      | Finance    |
-| priya@mcd.in     | IT         |
-| vikram@mcd.in    | Admin      |
-
-## Commands
-
-| Command           | Description          |
-|-------------------|----------------------|
-| `npm run dev`     | Start dev server     |
-| `npm run build`   | Build for production |
-| `npm run preview` | Preview production   |
-
-## Deployment
-
-### Vercel (Recommended)
-1. Push code to GitHub
-2. Connect repository to Vercel
-3. Deploy with one click
-
-### Firebase Configuration
-Update `src/firebase.js` with your Firebase project credentials.
-
-## Tech Stack
-
-- **Frontend**: React 18, Bootstrap 5
-- **Build Tool**: Vite
-- **Backend**: Firebase (Auth, Firestore)
-- **Theme**: Modern Indian Government Design
-
-## Team
-
+## 👥 Team
 - **Bhaskar & Smarth**: Frontend
 - **Kuber & Smarth**: Backend
 - **Kuber**: Design
