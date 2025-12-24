@@ -13,7 +13,7 @@ function isDemoAccount(email) {
     return demoEmails.includes(email);
 }
 
-function Employees({ role, user, hrPerms }) {
+function Employees({ role, user }) {
     const [staffList, setStaffList] = useState([]);
     const [showCreateForm, setShowCreateForm] = useState(false);
     const [creating, setCreating] = useState(false);
@@ -129,7 +129,7 @@ function Employees({ role, user, hrPerms }) {
         <div>
             <div className="d-flex justify-content-between align-items-center mb-4">
                 <h4 className="fw-bold mb-0">Employees</h4>
-                {(role === "admin" || (role === "hr" && hrPerms?.viewEmployees)) && (
+                {(role === "admin" || role === "hr") && (
                     <div className="d-flex gap-2">
                         <button className="btn btn-outline-primary" onClick={() => setShowCreateForm(!showCreateForm)}>
                             {showCreateForm ? "Hide Form" : "Add Employee"}
@@ -147,7 +147,7 @@ function Employees({ role, user, hrPerms }) {
             </div>
 
             {/* Edit Employee Modal */}
-            {(role === "admin" || (role === "hr" && hrPerms?.viewEmployees)) && editEmp && (
+            {(role === "admin" || role === "hr") && editEmp && (
                 <div className="position-fixed top-0 start-0 w-100 h-100 d-flex align-items-center justify-content-center z-3" style={{ backgroundColor: "rgba(0,0,0,0.5)", backdropFilter: "blur(2px)" }}>
                     <div className="bg-white rounded-4 shadow-lg p-4" style={{ width: "90%", maxWidth: "500px" }}>
                         <div className="d-flex justify-content-between align-items-center mb-3">
@@ -193,7 +193,7 @@ function Employees({ role, user, hrPerms }) {
                 />
             </div>
 
-            {(role === "admin" || (role === "hr" && hrPerms?.viewEmployees) && showCreateForm) && (
+            {(role === "admin" || role === "hr") && showCreateForm && (
                 <div className="card border-0 shadow-sm p-4 mb-4 bg-light" style={{ borderRadius: "15px" }}>
                     <h5 className="mb-3 fw-bold text-primary">Create Employee Account</h5>
                     <form className="row g-3" onSubmit={handleCreateEmployee}>
@@ -242,13 +242,13 @@ function Employees({ role, user, hrPerms }) {
                             <th className="py-3">Dept</th>
                             <th className="py-3">Emp ID</th>
                             <th className="py-3">Post</th>
-                            {(role === "admin" || (role === "hr" && hrPerms?.viewEmployees)) && <th className="py-3 text-center">Actions</th>}
+                            {(role === "admin" || role === "hr") && <th className="py-3 text-center">Actions</th>}
                         </tr>
                     </thead>
                     <tbody>
                         {filteredList.length === 0 ? (
                             <tr>
-                                <td colSpan={(role === "admin" || (role === "hr" && hrPerms?.viewEmployees)) ? "5" : "4"} className="text-center py-5 text-muted">
+                                <td colSpan={(role === "admin" || role === "hr") ? "5" : "4"} className="text-center py-5 text-muted">
                                     No employees found.
                                 </td>
                             </tr>
@@ -271,7 +271,7 @@ function Employees({ role, user, hrPerms }) {
                                         <td><span className="badge bg-light text-dark border">{s.dept}</span></td>
                                         <td><code>{s.empId}</code></td>
                                         <td>{s.post}</td>
-                                        {(role === "admin" || (role === "hr" && hrPerms?.viewEmployees)) && (
+                                        {(role === "admin" || role === "hr") && (
                                             <td className="text-center">
                                                 <button className="btn btn-sm btn-outline-primary me-2" onClick={() => setEditEmp(s)}>
                                                     Edit
@@ -285,7 +285,7 @@ function Employees({ role, user, hrPerms }) {
                                     {/* Show credentials row when clicked */}
                                     {selectedEmp === s.id && s.email && (
                                         <tr key={s.id + "-creds"} className="bg-light">
-                                            <td colSpan={(role === "admin" || (role === "hr" && hrPerms?.viewEmployees)) ? "5" : "4"} className="px-4 py-3">
+                                            <td colSpan={(role === "admin" || role === "hr") ? "5" : "4"} className="px-4 py-3">
                                                 <div className="d-flex align-items-center gap-4">
                                                     <div>
                                                         <small className="text-muted">Email:</small>

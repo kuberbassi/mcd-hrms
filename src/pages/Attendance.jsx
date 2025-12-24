@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { showStaff, markAttendance, resetAttendance, getAttendanceForDate, getMyAttendanceHistory } from "../backend";
 
-function Attendance({ role, user, hrPerms }) {
+function Attendance({ role, user }) {
     const [employees, setEmployees] = useState([]);
     const [attendance, setAttendance] = useState({});
     const [date, setDate] = useState(new Date().toISOString().split("T")[0]);
@@ -9,7 +9,7 @@ function Attendance({ role, user, hrPerms }) {
     const [myHistory, setMyHistory] = useState([]);
 
     useEffect(() => {
-        if (role === "admin" || (role === "hr" && hrPerms?.viewEmployees)) { // Use viewEmployees for reading list
+        if (role === "admin" || role === "hr") {
             const unsubscribe = showStaff((list) => {
                 setEmployees(list);
             });
@@ -20,10 +20,10 @@ function Attendance({ role, user, hrPerms }) {
     }, [role]);
 
     useEffect(() => {
-        if (role === "admin" || (role === "hr" && hrPerms?.markAttendance)) { // Use markAttendance for reading daily log
+        if (role === "admin" || role === "hr") {
             loadAttendance();
         }
-    }, [date, role, hrPerms]);
+    }, [date, role]);
 
     useEffect(() => {
         if (role === "employee" && user) {
@@ -42,7 +42,7 @@ function Attendance({ role, user, hrPerms }) {
     }
 
     async function handleMark(empId, status) {
-        if (role !== "admin" && !(role === "hr" && hrPerms?.markAttendance)) return;
+        if (role !== "admin" && role !== "hr") return;
         setSaving(true);
         try {
             await markAttendance(empId, date, status);
@@ -56,7 +56,7 @@ function Attendance({ role, user, hrPerms }) {
     }
 
     async function handleReset(empId) {
-        if (role !== "admin" && !(role === "hr" && hrPerms?.markAttendance)) return;
+        if (role !== "admin" && role !== "hr") return;
         if (!window.confirm("Reset attendance for this employee on " + date + "?")) return;
 
         setSaving(true);

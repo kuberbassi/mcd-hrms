@@ -4,7 +4,6 @@ import {
   login as firebaseLogin,
   logout as firebaseLogout,
   checkUser,
-  listenToSystemConfig,
 } from "./backend";
 
 import Dashboard from "./pages/Dashboard";
@@ -31,14 +30,6 @@ function App() {
   const [activeTab, setActiveTab] = useState("dashboard");
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
-  /* Import getSystemConfig at top */
-  const [hrPerms, setHrPerms] = useState({
-    viewEmployees: true,
-    markAttendance: true,
-    managePayroll: false,
-    approveTransfers: false
-  });
-
   useEffect(() => {
     const unsubscribe = checkUser((currentUser, userRole) => {
       setUser(currentUser);
@@ -46,16 +37,8 @@ function App() {
       setIsLoggedIn(!!currentUser);
     });
 
-    // Subscribe to system config changes (real-time)
-    const unsubscribeConfig = listenToSystemConfig((config) => {
-      if (config && config.hrAccess) {
-        setHrPerms(config.hrAccess);
-      }
-    });
-
     return () => {
       if (typeof unsubscribe === "function") unsubscribe();
-      if (typeof unsubscribeConfig === "function") unsubscribeConfig();
     };
   }, []);
 
@@ -83,25 +66,14 @@ function App() {
   function getTabs() {
     const tabs = [{ id: "dashboard", label: "Dashboard", icon: "🏠" }];
 
-    if (role === "admin" || (role === "hr" && hrPerms.viewEmployees)) {
+    if (role === "admin" || role === "hr") {
       tabs.push({ id: "employees", label: "Employees", icon: "👥" });
-    }
-
-    if (role === "admin" || (role === "hr" && hrPerms.markAttendance)) {
       tabs.push({ id: "attendance", label: "Attendance", icon: "✓" });
     } else {
-      // If HR can't mark, do they see 'My Attendance'? Yes, handled below/implicitly? 
-      // Logic: If NOT Admin/HR-Manager, fall through? 
-      // Wait, current logic was: if (admin || hr) { push main } else { push personal }.
-      // If HR permission is OFF, we should show PERSONAL tab instead of nothing?
-      // Let's refine:
-    }
-
-    if (!(role === "admin" || (role === "hr" && hrPerms.markAttendance))) {
       tabs.push({ id: "attendance", label: "My Attendance", icon: "✓" });
     }
 
-    if (role === "admin" || (role === "hr" && hrPerms.managePayroll)) {
+    if (role === "admin") {
       tabs.push({ id: "payroll", label: "Payroll", icon: "💰" });
     } else {
       tabs.push({ id: "payroll", label: "My Salary", icon: "💰" });
@@ -127,23 +99,23 @@ function App() {
   function renderPage() {
     switch (activeTab) {
       case "dashboard":
-        return <Dashboard role={role} user={user} setTab={setActiveTab} hrPerms={hrPerms} />;
+        return <Dashboard role={role} user={user} setTab={setActiveTab} />;
       case "employees":
-        return <Employees role={role} user={user} hrPerms={hrPerms} />;
+        return <Employees role={role} user={user} />;
       case "attendance":
-        return <Attendance role={role} user={user} hrPerms={hrPerms} />;
+        return <Attendance role={role} user={user} />;
       case "payroll":
-        return <Payroll role={role} user={user} hrPerms={hrPerms} />;
+        return <Payroll role={role} user={user} />;
       case "transfers":
         return <Transfers role={role} user={user} />;
       case "performance":
-        return <Performance role={role} user={user} hrPerms={hrPerms} />;
+        return <Performance role={role} user={user} />;
       case "grievances":
         return <Grievances role={role} user={user} />;
       case "settings":
         return <Settings />;
       default:
-        return <Dashboard role={role} user={user} setTab={setActiveTab} hrPerms={hrPerms} />;
+        return <Dashboard role={role} user={user} setTab={setActiveTab} />;
     }
   }
 
