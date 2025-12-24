@@ -219,6 +219,20 @@ export async function updateUserRole(email, newRole) {
     return false;
 }
 
+// Get all user roles (Admin use)
+export async function getAllUserRoles() {
+    const usersRef = collection(db, "users");
+    const snapshot = await getDocs(usersRef);
+    const roles = {};
+    snapshot.forEach(doc => {
+        const data = doc.data();
+        if (data.email) {
+            roles[data.email] = data.role || "employee";
+        }
+    });
+    return roles;
+}
+
 // Demo password for all demo accounts
 const DEMO_PASSWORD = "demo123";
 

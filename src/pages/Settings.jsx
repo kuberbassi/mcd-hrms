@@ -1,8 +1,9 @@
 import { useState, useEffect } from "react";
-import { showStaff, updateUserRole, getSystemConfig, updateSystemConfig } from "../backend";
+import { showStaff, updateUserRole, getSystemConfig, updateSystemConfig, getAllUserRoles } from "../backend";
 
 function Settings() {
     const [staffList, setStaffList] = useState([]);
+    const [userRoles, setUserRoles] = useState({});
     const [searchTerm, setSearchTerm] = useState("");
     const [hrPerms, setHrPerms] = useState({
         viewEmployees: true,
@@ -25,7 +26,12 @@ function Settings() {
                 setHrPerms(config.hrAccess);
             }
         }
+        async function loadRoles() {
+            const roles = await getAllUserRoles();
+            setUserRoles(roles);
+        }
         loadPerms();
+        loadRoles();
 
         return () => {
             if (typeof unsubscribe === "function") unsubscribe();
@@ -36,6 +42,7 @@ function Settings() {
         if (window.confirm(`Change role of ${email} to ${newRole}?`)) {
             const success = await updateUserRole(email, newRole);
             if (success) {
+                setUserRoles(prev => ({ ...prev, [email]: newRole }));
                 alert("Role updated successfully!");
             } else {
                 alert("Failed to update role. User might not exist in 'users' collection yet.");
@@ -102,7 +109,12 @@ function Settings() {
                                                     <div className="small text-muted">{emp.email}</div>
                                                 </td>
                                                 <td>
-                                                    <span className="badge bg-light text-dark border">Employee</span>
+                                                    <span className={`badge border ${(userRoles[emp.email] || "employee") === "admin" ? "bg-danger text-white" :
+                                                            (userRoles[emp.email] || "employee") === "hr" ? "bg-warning text-dark" :
+                                                                "bg-light text-dark"
+                                                        }`}>
+                                                        {(userRoles[emp.email] || "employee").toUpperCase()}
+                                                    </span>
                                                 </td>
                                                 <td>
                                                     <div className="dropdown">
