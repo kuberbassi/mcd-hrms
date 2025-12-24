@@ -258,6 +258,10 @@ export async function makeFakeData(adminEmail, adminPassword) {
         "vikram@mcd.in": { basic: 40000, da: 16000, hra: 8000 }
     };
 
+    let created = 0;
+    let skipped = 0;
+    let errors = [];
+
     try {
         for (const emp of demoEmployees) {
             let employeeDocId = null;
