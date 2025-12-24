@@ -2,7 +2,8 @@ import { useState, useEffect } from "react";
 import { showStaff, getPerformanceData, savePerformance, getMyProfile } from "../backend";
 
 function Performance({ role, user }) {
-    const [employees, setEmployees] = useState([]);
+    const [employees, setEmployees] = useState([]); // List of employees to manage
+    const [myProfile, setMyProfile] = useState(null); // Own profile for "My Performance"
     const [ratings, setRatings] = useState({});
     const [saving, setSaving] = useState(false);
     const [editingEmp, setEditingEmp] = useState(null);
@@ -11,17 +12,21 @@ function Performance({ role, user }) {
 
     useEffect(() => {
         let unsubscribe;
+
+        // 1. Fetch own profile (for HR & Employee)
+        if (user?.email && (role === "hr" || role === "employee")) {
+            getMyProfile(user.email).then((profile) => {
+                setMyProfile(profile);
+            });
+        }
+
+        // 2. Fetch staff list (for Admin & HR)
         if (role === "admin" || role === "hr") {
             unsubscribe = showStaff((list) => {
                 setEmployees(list);
             });
-        } else if (user?.email) {
-            getMyProfile(user.email).then((profile) => {
-                if (profile) {
-                    setEmployees([profile]);
-                }
-            });
         }
+
         return () => {
             if (typeof unsubscribe === "function") unsubscribe();
         };
@@ -65,7 +70,6 @@ function Performance({ role, user }) {
         setEditingEmp(null);
     }
 
-    // Helper: Determine badge based on rating
     function getBadge(rating) {
         if (!rating) return { label: "Not Rated", color: "bg-light text-muted", icon: "○" };
         if (rating === 5) return { label: "Top Performer", color: "bg-warning bg-opacity-10 text-warning", icon: "🏆" };
@@ -75,6 +79,69 @@ function Performance({ role, user }) {
     }
 
     const canManage = role === "admin" || role === "hr";
+
+    // Reusable Card Component
+    const PerformanceCard = ({ emp, isManagementView }) => {
+        const rData = ratings[emp.id] || {};
+        const badge = getBadge(rData.rating);
+        const progress = (rData.rating || 0) * 20;
+
+        return (
+            <div className="card border-0 shadow-sm h-100 rounded-4 overflow-hidden hover-shadow transition-all group">
+                <div className="card-body p-4">
+                    <div className="d-flex justify-content-between align-items-start mb-3">
+                        <div className="d-flex align-items-center">
+                            <div className="bg-light rounded-circle p-1 me-3">
+                                <div className="bg-white rounded-circle d-flex align-items-center justify-content-center fw-bold text-secondary shadow-sm" style={{ width: "42px", height: "42px" }}>
+                                    {emp.name.charAt(0)}
+                                </div>
+                            </div>
+                            <div>
+                                <h6 className="fw-bold mb-0 text-dark">{emp.name}</h6>
+                                <div className="small text-muted">{emp.dept}</div>
+                            </div>
+                        </div>
+                        <span className={`badge rounded-pill px-3 py-2 ${badge.color}`}>
+                            <span className="me-1">{badge.icon}</span> {badge.label}
+                        </span>
+                    </div>
+
+                    <div className="mb-3">
+                        <div className="d-flex justify-content-between small fw-bold text-muted mb-1">
+                            <span>Rating</span>
+                            <span>{rData.rating || 0}/5</span>
+                        </div>
+                        <div className="progress" style={{ height: "6px" }}>
+                            <div
+                                className={`progress-bar rounded-pill ${rData.rating >= 4 ? "bg-success" : rData.rating >= 3 ? "bg-primary" : "bg-warning"}`}
+                                style={{ width: `${progress}%` }}
+                            ></div>
+                        </div>
+                    </div>
+
+                    {rData.comment ? (
+                        <div className="bg-light rounded-3 p-3 mb-3 position-relative">
+                            <div className="position-absolute top-0 start-0 ms-2 mt-n2 bg-white px-1 text-muted small" style={{ lineHeight: 1 }}>💬</div>
+                            <p className="small text-muted mb-0 fst-italic">"{rData.comment}"</p>
+                        </div>
+                    ) : (
+                        <div className="mb-3 pb-4"></div>
+                    )}
+
+                    {isManagementView && (
+                        <button
+                            className="btn btn-outline-primary w-100 rounded-pill fw-medium btn-sm opacity-0 group-hover-opacity-100 transition-all"
+                            onClick={() => openEdit(emp)}
+                            style={{ opacity: rData.rating ? 0.8 : 1 }}
+                        >
+                            {rData.rating ? "Update Review" : "Write Review"}
+                        </button>
+                    )}
+                </div>
+                <div className={`h-1 w-100 ${rData.rating >= 4 ? "bg-success" : rData.rating >= 3 ? "bg-primary" : rData.rating ? "bg-warning" : "bg-light"}`}></div>
+            </div>
+        );
+    };
 
     return (
         <div className="animate-fade-in">
@@ -148,75 +215,36 @@ function Performance({ role, user }) {
                 </div>
             )}
 
-            <div className="row g-4">
-                {employees.length === 0 ? (
-                    <div className="col-12 py-5 text-center text-muted">No employees found.</div>
-                ) : (
-                    employees.map((emp) => {
-                        const rData = ratings[emp.id] || {};
-                        const badge = getBadge(rData.rating);
-                        const progress = (rData.rating || 0) * 20; // 5 stars = 100%
+            {/* Section 1: My Performance (HR & Employee) */}
+            {myProfile && (
+                <div className="mb-5 animate-slide-up">
+                    <h6 className="text-uppercase text-muted fw-bold small ls-1 mb-3">My Performance</h6>
+                    <div className="row">
+                        <div className="col-md-6 col-lg-4">
+                            <PerformanceCard emp={myProfile} isManagementView={false} />
+                        </div>
+                    </div>
+                </div>
+            )}
 
-                        return (
-                            <div key={emp.id} className="col-md-6 col-lg-4">
-                                <div className="card border-0 shadow-sm h-100 rounded-4 overflow-hidden hover-shadow transition-all group">
-                                    <div className="card-body p-4">
-                                        <div className="d-flex justify-content-between align-items-start mb-3">
-                                            <div className="d-flex align-items-center">
-                                                <div className="bg-light rounded-circle p-1 me-3">
-                                                    <div className="bg-white rounded-circle d-flex align-items-center justify-content-center fw-bold text-secondary shadow-sm" style={{ width: "42px", height: "42px" }}>
-                                                        {emp.name.charAt(0)}
-                                                    </div>
-                                                </div>
-                                                <div>
-                                                    <h6 className="fw-bold mb-0 text-dark">{emp.name}</h6>
-                                                    <div className="small text-muted">{emp.dept}</div>
-                                                </div>
-                                            </div>
-                                            <span className={`badge rounded-pill px-3 py-2 ${badge.color}`}>
-                                                <span className="me-1">{badge.icon}</span> {badge.label}
-                                            </span>
-                                        </div>
+            {/* Section 2: Team Performance (Admin & HR) */}
+            {canManage && (
+                <div className="animate-slide-up" style={{ animationDelay: "0.1s" }}>
+                    {myProfile && <h6 className="text-uppercase text-muted fw-bold small ls-1 mb-3">Team Performance</h6>}
 
-                                        <div className="mb-3">
-                                            <div className="d-flex justify-content-between small fw-bold text-muted mb-1">
-                                                <span>Rating</span>
-                                                <span>{rData.rating || 0}/5</span>
-                                            </div>
-                                            <div className="progress" style={{ height: "6px" }}>
-                                                <div
-                                                    className={`progress-bar rounded-pill ${rData.rating >= 4 ? "bg-success" : rData.rating >= 3 ? "bg-primary" : "bg-warning"}`}
-                                                    style={{ width: `${progress}%` }}
-                                                ></div>
-                                            </div>
-                                        </div>
-
-                                        {rData.comment ? (
-                                            <div className="bg-light rounded-3 p-3 mb-3 position-relative">
-                                                <div className="position-absolute top-0 start-0 ms-2 mt-n2 bg-white px-1 text-muted small" style={{ lineHeight: 1 }}>💬</div>
-                                                <p className="small text-muted mb-0 fst-italic">"{rData.comment}"</p>
-                                            </div>
-                                        ) : (
-                                            <div className="mb-3 pb-4"></div> // Spacer
-                                        )}
-
-                                        {canManage && (
-                                            <button
-                                                className="btn btn-outline-primary w-100 rounded-pill fw-medium btn-sm opacity-0 group-hover-opacity-100 transition-all"
-                                                onClick={() => openEdit(emp)}
-                                                style={{ opacity: rData.rating ? 0.8 : 1 }} // Always visible if unrated
-                                            >
-                                                {rData.rating ? "Update Review" : "Write Review"}
-                                            </button>
-                                        )}
-                                    </div>
-                                    <div className={`h-1 w-100 ${rData.rating >= 4 ? "bg-success" : rData.rating >= 3 ? "bg-primary" : rData.rating ? "bg-warning" : "bg-light"}`}></div>
+                    <div className="row g-4">
+                        {employees.length === 0 ? (
+                            <div className="col-12 py-5 text-center text-muted">No employees found.</div>
+                        ) : (
+                            employees.map((emp) => (
+                                <div key={emp.id} className="col-md-6 col-lg-4">
+                                    <PerformanceCard emp={emp} isManagementView={true} />
                                 </div>
-                            </div>
-                        );
-                    })
-                )}
-            </div>
+                            ))
+                        )}
+                    </div>
+                </div>
+            )}
 
             <style jsx>{`
                 .hover-shadow:hover { transform: translateY(-3px); box-shadow: 0 10px 20px rgba(0,0,0,0.05) !important; }

@@ -26,7 +26,7 @@ function Payroll({ role, user }) {
     }, [role]);
 
     useEffect(() => {
-        if (role === "employee" && user) {
+        if ((role === "employee" || role === "hr") && user) {
             loadMyPayroll();
         }
     }, [role, user]);
@@ -69,7 +69,7 @@ function Payroll({ role, user }) {
         return (data.basic || 0) + (data.da || 0) + (data.hra || 0);
     }
 
-    if (role === "employee") {
+    if (role === "employee" || role === "hr") {
         return (
             <div>
                 <h4 className="fw-bold mb-4">💰 My Salary</h4>
@@ -98,7 +98,10 @@ function Payroll({ role, user }) {
                                             <td className="text-end fw-medium">₹{(myPayroll.hra || 0).toLocaleString()}</td>
                                         </tr>
                                         <tr className="border-top">
-                                            <td className="fw-bold">Total Monthly Salary</td>
+                                            <td className="fw-bold">
+                                                Total Monthly Salary
+                                                <div className="small fw-normal text-muted fst-italic mt-1">* Salary paid on: Last day of the month</div>
+                                            </td>
                                             <td className="text-end fw-bold text-success fs-4">
                                                 ₹{((myPayroll.basic || 0) + (myPayroll.da || 0) + (myPayroll.hra || 0)).toLocaleString()}
                                             </td>

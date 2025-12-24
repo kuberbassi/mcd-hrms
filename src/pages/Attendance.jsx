@@ -9,7 +9,7 @@ function Attendance({ role, user }) {
     const [myHistory, setMyHistory] = useState([]);
 
     useEffect(() => {
-        if (role === "admin") {
+        if (role === "admin" || role === "hr") {
             const unsubscribe = showStaff((list) => {
                 setEmployees(list);
             });
@@ -20,7 +20,7 @@ function Attendance({ role, user }) {
     }, [role]);
 
     useEffect(() => {
-        if (role === "admin") {
+        if (role === "admin" || role === "hr") {
             loadAttendance();
         }
     }, [date, role]);
@@ -42,7 +42,7 @@ function Attendance({ role, user }) {
     }
 
     async function handleMark(empId, status) {
-        if (role !== "admin") return;
+        if (role !== "admin" && role !== "hr") return;
         setSaving(true);
         try {
             await markAttendance(empId, date, status);
@@ -56,7 +56,7 @@ function Attendance({ role, user }) {
     }
 
     async function handleReset(empId) {
-        if (role !== "admin") return;
+        if (role !== "admin" && role !== "hr") return;
         if (!window.confirm("Reset attendance for this employee on " + date + "?")) return;
 
         setSaving(true);
