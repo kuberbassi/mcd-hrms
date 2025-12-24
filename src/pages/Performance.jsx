@@ -11,12 +11,11 @@ function Performance({ role, user }) {
 
     useEffect(() => {
         let unsubscribe;
-        if (role === "admin") {
+        if (role === "admin" || role === "hr") {
             unsubscribe = showStaff((list) => {
                 setEmployees(list);
             });
         } else if (user?.email) {
-            // For regular employees, only show their own card
             getMyProfile(user.email).then((profile) => {
                 if (profile) {
                     setEmployees([profile]);
@@ -38,7 +37,7 @@ function Performance({ role, user }) {
     }
 
     async function handleRate(empId, rating, comment) {
-        if (role !== "admin") return;
+        if (role !== "admin" && role !== "hr") return;
         setSaving(true);
 
         try {
@@ -66,67 +65,84 @@ function Performance({ role, user }) {
         setEditingEmp(null);
     }
 
-    function showStars(count) {
-        let stars = "";
-        for (let i = 0; i < 5; i++) {
-            if (i < count) {
-                stars += "⭐";
-            } else {
-                stars += "☆";
-            }
-        }
-        return stars;
+    // Helper: Determine badge based on rating
+    function getBadge(rating) {
+        if (!rating) return { label: "Not Rated", color: "bg-light text-muted", icon: "○" };
+        if (rating === 5) return { label: "Top Performer", color: "bg-warning bg-opacity-10 text-warning", icon: "🏆" };
+        if (rating === 4) return { label: "Excellent", color: "bg-success bg-opacity-10 text-success", icon: "🌟" };
+        if (rating === 3) return { label: "Good", color: "bg-primary bg-opacity-10 text-primary", icon: "✅" };
+        return { label: "Needs Improvement", color: "bg-danger bg-opacity-10 text-danger", icon: "⚠️" };
     }
 
+    const canManage = role === "admin" || role === "hr";
+
     return (
-        <div>
-            <h4 className="fw-bold mb-4">📈 Performance Tracking</h4>
+        <div className="animate-fade-in">
+            <div className="d-flex justify-content-between align-items-center mb-4">
+                <div>
+                    <h4 className="fw-bold mb-1">Performance Reviews</h4>
+                    <p className="text-muted small mb-0">Track and evaluate employee performance.</p>
+                </div>
+            </div>
 
             {/* Edit Modal */}
             {editingEmp && (
                 <div className="position-fixed top-0 start-0 w-100 h-100 d-flex align-items-center justify-content-center" style={{ backgroundColor: "rgba(0,0,0,0.5)", backdropFilter: "blur(5px)", zIndex: 9999 }}>
-                    <div className="bg-white rounded-4 shadow-lg p-4" style={{ width: "90%", maxWidth: "400px" }}>
-                        <div className="d-flex justify-content-between align-items-center mb-3">
-                            <h5 className="mb-0 fw-bold text-primary">Edit Rating</h5>
-                            <button onClick={() => setEditingEmp(null)} className="btn btn-sm btn-light rounded-circle">✕</button>
+                    <div className="bg-white rounded-4 shadow-lg overflow-hidden animate-slide-up" style={{ width: "90%", maxWidth: "450px" }}>
+                        <div className="p-4 border-bottom bg-light d-flex justify-content-between align-items-center">
+                            <h5 className="mb-0 fw-bold">Evaluate Performance</h5>
+                            <button onClick={() => setEditingEmp(null)} className="btn btn-sm btn-light rounded-circle shadow-sm">✕</button>
                         </div>
 
-                        <div className="mb-3">
-                            <div className="fw-bold">{editingEmp.name}</div>
-                            <div className="text-muted small">{editingEmp.dept} • {editingEmp.post}</div>
-                        </div>
-
-                        <div className="mb-3">
-                            <label className="form-label small text-muted fw-bold">Rating</label>
-                            <div className="btn-group w-100">
-                                {[1, 2, 3, 4, 5].map((num) => (
-                                    <button
-                                        key={num}
-                                        className={`btn ${editRating === num ? "btn-warning" : "btn-outline-warning"}`}
-                                        onClick={() => setEditRating(num)}
-                                    >
-                                        {num}
-                                    </button>
-                                ))}
+                        <div className="p-4">
+                            <div className="d-flex align-items-center mb-4">
+                                <div className="bg-primary text-white rounded-circle d-flex align-items-center justify-content-center fw-bold fs-5 me-3" style={{ width: "48px", height: "48px" }}>
+                                    {editingEmp.name.charAt(0)}
+                                </div>
+                                <div>
+                                    <h6 className="fw-bold mb-0 text-dark">{editingEmp.name}</h6>
+                                    <div className="text-muted small">{editingEmp.post}</div>
+                                </div>
                             </div>
-                        </div>
 
-                        <div className="mb-4">
-                            <label className="form-label small text-muted fw-bold">Comment</label>
-                            <textarea
-                                className="form-control"
-                                rows="3"
-                                placeholder="Add feedback..."
-                                value={editComment}
-                                onChange={(e) => setEditComment(e.target.value)}
-                            />
-                        </div>
+                            <div className="mb-4">
+                                <label className="form-label small text-muted fw-bold text-uppercase ls-1">Rating</label>
+                                <div className="d-flex justify-content-between bg-light p-2 rounded-3">
+                                    {[1, 2, 3, 4, 5].map((num) => (
+                                        <button
+                                            key={num}
+                                            className={`btn btn-lg border-0 rounded-3 flex-fill mx-1 transition-all ${editRating === num ? "bg-white shadow text-primary" : "text-muted opacity-50"}`}
+                                            onClick={() => setEditRating(num)}
+                                            style={{ transform: editRating === num ? 'scale(1.05)' : 'scale(1)' }}
+                                        >
+                                            <div className="h4 mb-0">{num === 5 ? "🏆" : "⭐"}</div>
+                                            <div className="small fw-bold">{num}</div>
+                                        </button>
+                                    ))}
+                                </div>
+                                <div className="text-center mt-2 small fw-bold" style={{ color: getBadge(editRating).color.includes('warning') ? '#f57c00' : '#666' }}>
+                                    {getBadge(editRating).label}
+                                </div>
+                            </div>
 
-                        <div className="d-flex justify-content-end gap-2">
-                            <button className="btn btn-light" onClick={() => setEditingEmp(null)}>Cancel</button>
-                            <button className="btn btn-primary px-4" onClick={saveEdit} disabled={saving}>
-                                {saving ? "Saving..." : "Save Rating"}
-                            </button>
+                            <div className="mb-4">
+                                <label className="form-label small text-muted fw-bold text-uppercase ls-1">Feedback</label>
+                                <textarea
+                                    className="form-control bg-light border-0"
+                                    rows="4"
+                                    placeholder="Enter detailed feedback and goals..."
+                                    value={editComment}
+                                    onChange={(e) => setEditComment(e.target.value)}
+                                    style={{ resize: "none" }}
+                                />
+                            </div>
+
+                            <div className="d-flex gap-2">
+                                <button className="btn btn-light flex-grow-1 fw-bold" onClick={() => setEditingEmp(null)}>Cancel</button>
+                                <button className="btn btn-primary flex-grow-1 fw-bold" onClick={saveEdit} disabled={saving}>
+                                    {saving ? "Saving..." : "Submit Review"}
+                                </button>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -134,68 +150,79 @@ function Performance({ role, user }) {
 
             <div className="row g-4">
                 {employees.length === 0 ? (
-                    <div className="col-12">
-                        <div className="card border-0 shadow-sm p-5 text-center" style={{ borderRadius: "15px" }}>
-                            <p className="text-muted mb-0">No employees found.</p>
-                        </div>
-                    </div>
+                    <div className="col-12 py-5 text-center text-muted">No employees found.</div>
                 ) : (
-                    employees.map((emp) => (
-                        <div key={emp.id} className="col-md-6 col-lg-4">
-                            <div className="card border-0 shadow-sm h-100" style={{ borderRadius: "15px" }}>
-                                <div className="card-body">
-                                    <div className="d-flex justify-content-between align-items-start">
-                                        <div>
-                                            <h5 className="fw-bold mb-1">{emp.name}</h5>
-                                            <p className="text-muted small mb-3">{emp.dept} • {emp.post}</p>
+                    employees.map((emp) => {
+                        const rData = ratings[emp.id] || {};
+                        const badge = getBadge(rData.rating);
+                        const progress = (rData.rating || 0) * 20; // 5 stars = 100%
+
+                        return (
+                            <div key={emp.id} className="col-md-6 col-lg-4">
+                                <div className="card border-0 shadow-sm h-100 rounded-4 overflow-hidden hover-shadow transition-all group">
+                                    <div className="card-body p-4">
+                                        <div className="d-flex justify-content-between align-items-start mb-3">
+                                            <div className="d-flex align-items-center">
+                                                <div className="bg-light rounded-circle p-1 me-3">
+                                                    <div className="bg-white rounded-circle d-flex align-items-center justify-content-center fw-bold text-secondary shadow-sm" style={{ width: "42px", height: "42px" }}>
+                                                        {emp.name.charAt(0)}
+                                                    </div>
+                                                </div>
+                                                <div>
+                                                    <h6 className="fw-bold mb-0 text-dark">{emp.name}</h6>
+                                                    <div className="small text-muted">{emp.dept}</div>
+                                                </div>
+                                            </div>
+                                            <span className={`badge rounded-pill px-3 py-2 ${badge.color}`}>
+                                                <span className="me-1">{badge.icon}</span> {badge.label}
+                                            </span>
                                         </div>
-                                        {role === "admin" && ratings[emp.id]?.rating > 0 && (
+
+                                        <div className="mb-3">
+                                            <div className="d-flex justify-content-between small fw-bold text-muted mb-1">
+                                                <span>Rating</span>
+                                                <span>{rData.rating || 0}/5</span>
+                                            </div>
+                                            <div className="progress" style={{ height: "6px" }}>
+                                                <div
+                                                    className={`progress-bar rounded-pill ${rData.rating >= 4 ? "bg-success" : rData.rating >= 3 ? "bg-primary" : "bg-warning"}`}
+                                                    style={{ width: `${progress}%` }}
+                                                ></div>
+                                            </div>
+                                        </div>
+
+                                        {rData.comment ? (
+                                            <div className="bg-light rounded-3 p-3 mb-3 position-relative">
+                                                <div className="position-absolute top-0 start-0 ms-2 mt-n2 bg-white px-1 text-muted small" style={{ lineHeight: 1 }}>💬</div>
+                                                <p className="small text-muted mb-0 fst-italic">"{rData.comment}"</p>
+                                            </div>
+                                        ) : (
+                                            <div className="mb-3 pb-4"></div> // Spacer
+                                        )}
+
+                                        {canManage && (
                                             <button
-                                                className="btn btn-sm btn-outline-primary rounded-pill"
+                                                className="btn btn-outline-primary w-100 rounded-pill fw-medium btn-sm opacity-0 group-hover-opacity-100 transition-all"
                                                 onClick={() => openEdit(emp)}
+                                                style={{ opacity: rData.rating ? 0.8 : 1 }} // Always visible if unrated
                                             >
-                                                Edit
+                                                {rData.rating ? "Update Review" : "Write Review"}
                                             </button>
                                         )}
                                     </div>
-
-                                    {/* Current Rating */}
-                                    <div className="mb-3">
-                                        <span className="fs-4">{showStars(ratings[emp.id]?.rating || 0)}</span>
-                                        <span className="ms-2 text-muted">({ratings[emp.id]?.rating || 0}/5)</span>
-                                    </div>
-
-                                    {/* Comment */}
-                                    {ratings[emp.id]?.comment && (
-                                        <p className="text-muted small fst-italic mb-3">
-                                            "{ratings[emp.id].comment}"
-                                        </p>
-                                    )}
-
-                                    {/* Admin can rate (quick buttons for new ratings) */}
-                                    {role === "admin" && !ratings[emp.id]?.rating && (
-                                        <div className="border-top pt-3">
-                                            <div className="btn-group mb-2">
-                                                {[1, 2, 3, 4, 5].map((num) => (
-                                                    <button
-                                                        key={num}
-                                                        className="btn btn-sm btn-outline-warning"
-                                                        onClick={() => openEdit({ ...emp, initialRating: num })}
-                                                        disabled={saving}
-                                                    >
-                                                        {num}
-                                                    </button>
-                                                ))}
-                                            </div>
-                                            <div className="small text-muted">Click to add rating</div>
-                                        </div>
-                                    )}
+                                    <div className={`h-1 w-100 ${rData.rating >= 4 ? "bg-success" : rData.rating >= 3 ? "bg-primary" : rData.rating ? "bg-warning" : "bg-light"}`}></div>
                                 </div>
                             </div>
-                        </div>
-                    ))
+                        );
+                    })
                 )}
             </div>
+
+            <style jsx>{`
+                .hover-shadow:hover { transform: translateY(-3px); box-shadow: 0 10px 20px rgba(0,0,0,0.05) !important; }
+                .group:hover .group-hover-opacity-100 { opacity: 1 !important; }
+                .transition-all { transition: all 0.2s ease; }
+            `}</style>
         </div>
     );
 }

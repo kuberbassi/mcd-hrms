@@ -20,7 +20,7 @@ function Dashboard({ role, user, setTab }) {
     const [showProfile, setShowProfile] = useState(false);
 
     useEffect(() => {
-        if (role === "admin") {
+        if (role === "admin" || role === "hr") {
             const unsubscribe = showStaff((list) => {
                 const deptCount = {};
                 list.forEach((emp) => {
@@ -56,20 +56,20 @@ function Dashboard({ role, user, setTab }) {
         setMyProfile(profileData);
     }
 
-    // Admin Dashboard - Premium Redesign
-    if (role === "admin") {
+    // Admin & HR Dashboard - Premium Redesign
+    if (role === "admin" || role === "hr") {
         return (
             <div className="animate-fade-in">
-                {/* Admin Welcome Banner */}
-                <div className="rounded-4 p-4 p-md-5 mb-4 mb-md-5 text-white position-relative overflow-hidden shadow-sm animate-slide-up" style={{ backgroundColor: "#263238", animationDelay: "0.1s" }}>
-                    <div className="position-absolute end-0 top-0 h-100" style={{ width: "250px", background: `linear-gradient(135deg, transparent 40%, #37474f 40%)`, opacity: 0.8 }}></div>
-                    <div className="position-absolute start-0 bottom-0 mb-n5 ms-n5 rounded-circle bg-white" style={{ width: "200px", height: "200px", opacity: 0.05 }}></div>
+                {/* Welcome Banner */}
+                <div className="rounded-4 p-4 p-md-5 mb-4 mb-md-5 text-white position-relative overflow-hidden shadow-sm animate-slide-up" style={{ backgroundColor: role === "admin" ? "#263238" : THEME.secondary, animationDelay: "0.1s" }}>
+                    <div className="position-absolute end-0 top-0 h-100" style={{ width: "250px", background: `linear-gradient(135deg, transparent 40%, #000 20%)`, opacity: 0.1 }}></div>
+                    <div className="position-absolute start-0 bottom-0 mb-n5 ms-n5 rounded-circle bg-white" style={{ width: "200px", height: "200px", opacity: 0.1 }}></div>
 
                     <div className="position-relative z-1">
                         <div className="d-flex justify-content-between align-items-center">
                             <div>
-                                <h6 className="text-uppercase ls-2 mb-2 opacity-75 fw-bold" style={{ fontSize: "0.8rem" }}>Control Center</h6>
-                                <h1 className="display-5 fw-bold mb-1">Administrator Dashboard</h1>
+                                <h6 className="text-uppercase ls-2 mb-2 opacity-75 fw-bold" style={{ fontSize: "0.8rem" }}>{role === "admin" ? "Control Center" : "Management Portal"}</h6>
+                                <h1 className="display-5 fw-bold mb-1">{role === "admin" ? "Administrator Dashboard" : "HR Manager Dashboard"}</h1>
                                 <p className="mb-0 opacity-75">Overview of system performance and personnel</p>
                             </div>
                             <div className="d-none d-md-block text-end">
@@ -162,14 +162,18 @@ function Dashboard({ role, user, setTab }) {
                                         <span>Manage Employees</span>
                                         <span>→</span>
                                     </button>
-                                    <button
-                                        className="btn btn-light fw-bold py-3 text-start px-4 rounded-3 shadow-sm d-flex align-items-center justify-content-between btn-hover-effect"
-                                        style={{ background: "rgba(255,255,255,0.9)" }}
-                                        onClick={() => setTab("settings")}
-                                    >
-                                        <span>System Settings</span>
-                                        <span>→</span>
-                                    </button>
+
+                                    {role === "admin" && (
+                                        <button
+                                            className="btn btn-light fw-bold py-3 text-start px-4 rounded-3 shadow-sm d-flex align-items-center justify-content-between btn-hover-effect"
+                                            style={{ background: "rgba(255,255,255,0.9)" }}
+                                            onClick={() => setTab("settings")}
+                                        >
+                                            <span>System Settings</span>
+                                            <span>→</span>
+                                        </button>
+                                    )}
+
                                     <div className="p-3 rounded-3 bg-black bg-opacity-25 mt-2">
                                         <div className="d-flex align-items-center mb-2">
                                             <div className="bg-success rounded-circle p-1 me-2" style={{ width: "8px", height: "8px" }}></div>
