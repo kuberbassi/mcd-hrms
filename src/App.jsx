@@ -155,7 +155,7 @@ function App() {
   const tabs = getTabs();
 
   return (
-    <div className="min-vh-100" style={{ backgroundColor: THEME.bg, paddingBottom: "80px" }}>
+    <div className="min-vh-100 d-flex flex-column" style={{ backgroundColor: THEME.bg, paddingBottom: "80px" }}>
       {/* Mobile Header with Hamburger */}
       <nav className="navbar navbar-dark shadow-sm sticky-top d-md-none" style={{ backgroundColor: THEME.primary }}>
         <div className="container-fluid px-3">
@@ -258,6 +258,11 @@ function App() {
       <div className="container px-3 px-md-4 py-3 py-md-5">
         {renderPage()}
       </div>
+
+      {/* Footer */}
+      <footer className="text-center py-4 text-muted small mt-auto" style={{ borderTop: "1px solid rgba(0,0,0,0.05)" }}>
+        <p className="mb-0">© {new Date().getFullYear()} Municipal Corporation of Delhi. All rights reserved.</p>
+      </footer>
 
       {/* Mobile Bottom Navigation */}
       <div className="fixed-bottom bg-white border-top shadow d-md-none" style={{ zIndex: 1000 }}>
