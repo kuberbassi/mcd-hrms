@@ -3,9 +3,14 @@ rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
 
-    // Users - each user can only read/write their own doc
+    // Users - allow read/write for authenticated users (needed for role management)
     match /users/{userId} {
-      allow read, write: if request.auth != null && request.auth.uid == userId;
+      allow read, write: if request.auth != null;
+    }
+
+    // System Config - allow read/write for authenticated users (needed for HR settings)
+    match /system/{docId} {
+      allow read, write: if request.auth != null;
     }
 
     // Employees - logged in users can read/write
