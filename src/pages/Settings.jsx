@@ -21,9 +21,13 @@ function Settings() {
 
         // Load permissions from database
         async function loadPerms() {
-            const config = await getSystemConfig();
-            if (config && config.hrAccess) {
-                setHrPerms(config.hrAccess);
+            try {
+                const config = await getSystemConfig();
+                if (config && config.hrAccess) {
+                    setHrPerms(config.hrAccess);
+                }
+            } catch (err) {
+                console.warn("Failed to load permissions (likely missing firestore rules):", err.message);
             }
         }
         async function loadRoles() {
@@ -110,8 +114,8 @@ function Settings() {
                                                 </td>
                                                 <td>
                                                     <span className={`badge border ${(userRoles[emp.email] || "employee") === "admin" ? "bg-danger text-white" :
-                                                            (userRoles[emp.email] || "employee") === "hr" ? "bg-warning text-dark" :
-                                                                "bg-light text-dark"
+                                                        (userRoles[emp.email] || "employee") === "hr" ? "bg-warning text-dark" :
+                                                            "bg-light text-dark"
                                                         }`}>
                                                         {(userRoles[emp.email] || "employee").toUpperCase()}
                                                     </span>

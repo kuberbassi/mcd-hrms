@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, Fragment } from "react";
 import { showStaff, removeStaff, createEmployeeAccount, makeFakeData, updateEmployee } from "../backend";
 
 const DEMO_PASSWORD = "demo123";
@@ -254,8 +254,8 @@ function Employees({ role, user }) {
                             </tr>
                         ) : (
                             filteredList.map((s) => (
-                                <>
-                                    <tr key={s.id} className="align-middle">
+                                <Fragment key={s.id}>
+                                    <tr className="align-middle">
                                         <td className="px-4">
                                             <span
                                                 className="fw-medium text-primary"
@@ -308,7 +308,7 @@ function Employees({ role, user }) {
                                             </td>
                                         </tr>
                                     )}
-                                </>
+                                </Fragment>
                             ))
                         )}
                     </tbody>
