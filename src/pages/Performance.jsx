@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
-import { showStaff, getPerformanceData, savePerformance } from "../backend";
+import { showStaff, getPerformanceData, savePerformance, getMyProfile } from "../backend";
 
-function Performance({ role }) {
+function Performance({ role, user }) {
     const [employees, setEmployees] = useState([]);
     const [ratings, setRatings] = useState({});
     const [saving, setSaving] = useState(false);
@@ -10,13 +10,23 @@ function Performance({ role }) {
     const [editComment, setEditComment] = useState("");
 
     useEffect(() => {
-        const unsubscribe = showStaff((list) => {
-            setEmployees(list);
-        });
+        let unsubscribe;
+        if (role === "admin") {
+            unsubscribe = showStaff((list) => {
+                setEmployees(list);
+            });
+        } else if (user?.email) {
+            // For regular employees, only show their own card
+            getMyProfile(user.email).then((profile) => {
+                if (profile) {
+                    setEmployees([profile]);
+                }
+            });
+        }
         return () => {
             if (typeof unsubscribe === "function") unsubscribe();
         };
-    }, []);
+    }, [role, user]);
 
     useEffect(() => {
         loadRatings();

@@ -79,9 +79,7 @@ function App() {
       tabs.push({ id: "payroll", label: "My Salary", icon: "💰" });
     }
 
-    if (role === "admin") {
-      tabs.push({ id: "performance", label: "Performance", icon: "📊" });
-    }
+    tabs.push({ id: "performance", label: role === "admin" ? "Performance" : "My Performance", icon: "📊" });
 
     tabs.push({ id: "transfers", label: role === "admin" ? "Transfers" : "Transfer Request", icon: "📋" });
     tabs.push({ id: "grievances", label: role === "admin" ? "Grievances" : "Submit Complaint", icon: "💬" });
@@ -111,7 +109,7 @@ function App() {
       case "transfers":
         return <Transfers role={role} user={user} />;
       case "performance":
-        return <Performance role={role} />;
+        return <Performance role={role} user={user} />;
       case "grievances":
         return <Grievances role={role} user={user} />;
       case "settings":
