@@ -4,7 +4,7 @@ import {
   login as firebaseLogin,
   logout as firebaseLogout,
   checkUser,
-  getSystemConfig,
+  listenToSystemConfig,
 } from "./backend";
 
 import Dashboard from "./pages/Dashboard";
@@ -46,21 +46,16 @@ function App() {
       setIsLoggedIn(!!currentUser);
     });
 
-    // Load HR Permissions
-    async function loadConfig() {
-      try {
-        const config = await getSystemConfig();
-        if (config && config.hrAccess) {
-          setHrPerms(config.hrAccess);
-        }
-      } catch (err) {
-        console.warn("Failed to load config:", err);
+    // Subscribe to system config changes (real-time)
+    const unsubscribeConfig = listenToSystemConfig((config) => {
+      if (config && config.hrAccess) {
+        setHrPerms(config.hrAccess);
       }
-    }
-    loadConfig();
+    });
 
     return () => {
       if (typeof unsubscribe === "function") unsubscribe();
+      if (typeof unsubscribeConfig === "function") unsubscribeConfig();
     };
   }, []);
 

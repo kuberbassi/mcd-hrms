@@ -37,6 +37,26 @@ export async function getSystemConfig() {
     };
 }
 
+// Real-time listener for system config
+export function listenToSystemConfig(callback) {
+    const docRef = doc(db, "system", "config");
+    return onSnapshot(docRef, (docSnap) => {
+        if (docSnap.exists()) {
+            callback(docSnap.data());
+        } else {
+            // Default config
+            callback({
+                hrAccess: {
+                    viewEmployees: true,
+                    markAttendance: true,
+                    managePayroll: false,
+                    approveTransfers: false
+                }
+            });
+        }
+    });
+}
+
 export async function updateSystemConfig(data) {
     const docRef = doc(db, "system", "config");
     await setDoc(docRef, data, { merge: true });
