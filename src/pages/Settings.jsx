@@ -31,8 +31,12 @@ function Settings() {
             }
         }
         async function loadRoles() {
-            const roles = await getAllUserRoles();
-            setUserRoles(roles);
+            try {
+                const roles = await getAllUserRoles();
+                setUserRoles(roles);
+            } catch (err) {
+                console.warn("Failed to load roles (likely missing firestore rules):", err.message);
+            }
         }
         loadPerms();
         loadRoles();
@@ -44,12 +48,17 @@ function Settings() {
 
     async function handleRoleChange(email, newRole) {
         if (window.confirm(`Change role of ${email} to ${newRole}?`)) {
-            const success = await updateUserRole(email, newRole);
-            if (success) {
-                setUserRoles(prev => ({ ...prev, [email]: newRole }));
-                alert("Role updated successfully!");
-            } else {
-                alert("Failed to update role. User might not exist in 'users' collection yet.");
+            try {
+                const success = await updateUserRole(email, newRole);
+                if (success) {
+                    setUserRoles(prev => ({ ...prev, [email]: newRole }));
+                    alert("Role updated successfully!");
+                } else {
+                    alert("Failed to update role. User might not exist in 'users' collection yet.");
+                }
+            } catch (err) {
+                console.error("Role update failed:", err);
+                alert("Failed to update role: " + err.message + "\n(Did you deploy the firestore rules?)");
             }
         }
     }
