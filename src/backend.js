@@ -248,54 +248,90 @@ const demoEmployees = [
 // Create demo accounts with real Firebase Auth
 // Admin must be logged in first
 export async function makeFakeData(adminEmail, adminPassword) {
-    let created = 0;
-    let skipped = 0;
-    let errors = [];
+    // List of demo payroll stats (Basic, DA, HRA)
+    // DA ~40% of Basic, HRA ~20% of Basic
+    const demoPayroll = {
+        "raj@mcd.in": { basic: 80000, da: 32000, hra: 16000 },
+        "sonia@mcd.in": { basic: 70000, da: 28000, hra: 14000 },
+        "amit@mcd.in": { basic: 60000, da: 24000, hra: 12000 },
+        "priya@mcd.in": { basic: 50000, da: 20000, hra: 10000 },
+        "vikram@mcd.in": { basic: 40000, da: 16000, hra: 8000 }
+    };
 
-    for (const emp of demoEmployees) {
-        try {
-            // Try to create the auth account
-            const userCredential = await createUserWithEmailAndPassword(auth, emp.email, DEMO_PASSWORD);
-            const newUser = userCredential.user;
+    try {
+        for (const emp of demoEmployees) {
+            let employeeDocId = null;
 
-            // Create user profile with employee role
-            await setDoc(doc(db, "users", newUser.uid), {
-                email: emp.email,
-                role: "employee",
-                name: emp.name,
-                createdAt: serverTimestamp()
-            });
+            try {
+                // Try to create the auth account
+                const userCredential = await createUserWithEmailAndPassword(auth, emp.email, DEMO_PASSWORD);
+                const newUser = userCredential.user;
 
-            // Add to employees collection
-            await addDoc(collection(db, "employees"), {
-                name: emp.name,
-                dept: emp.dept,
-                empId: emp.empId,
-                post: emp.post,
-                email: emp.email,
-                uid: newUser.uid,
-                time: serverTimestamp()
-            });
+                // Create user profile
+                await setDoc(doc(db, "users", newUser.uid), {
+                    email: emp.email,
+                    role: "employee",
+                    name: emp.name,
+                    createdAt: serverTimestamp()
+                });
 
-            created++;
+                // Add to employees collection
+                const empRef = await addDoc(collection(db, "employees"), {
+                    name: emp.name,
+                    dept: emp.dept,
+                    empId: emp.empId,
+                    post: emp.post,
+                    email: emp.email,
+                    uid: newUser.uid,
+                    time: serverTimestamp()
+                });
+                employeeDocId = empRef.id;
 
-            // Sign back in as admin to continue creating more accounts
-            await signInWithEmailAndPassword(auth, adminEmail, adminPassword);
+                created++;
 
-        } catch (error) {
-            console.error("Error creating " + emp.email + ":", error.code, error.message);
+                // Sign back in as admin to continue
+                await signInWithEmailAndPassword(auth, adminEmail, adminPassword);
 
-            if (error.code === "auth/email-already-in-use") {
-                skipped++;
-            } else {
-                errors.push(emp.email + ": " + error.message);
+            } catch (error) {
+                if (error.code === "auth/email-already-in-use") {
+                    skipped++;
+                    // Find existing employee doc to update payroll
+                    const q = query(collection(db, "employees"));
+                    const querySnapshot = await getDocs(q);
+                    querySnapshot.forEach((doc) => {
+                        if (doc.data().email === emp.email) {
+                            employeeDocId = doc.id;
+                        }
+                    });
+                } else {
+                    console.error("Error creating " + emp.email + ":", error.message);
+                    errors.push(emp.email + ": " + error.message);
+                }
+            }
+
+            // Create/Update Payroll Data if we have the employee ID
+            if (employeeDocId && demoPayroll[emp.email]) {
+                const p = demoPayroll[emp.email];
+                await setDoc(doc(db, "payroll", employeeDocId), {
+                    empId: employeeDocId,
+                    basic: p.basic,
+                    da: p.da,
+                    hra: p.hra,
+                    total: p.basic + p.da + p.hra,
+                    updatedAt: serverTimestamp()
+                });
             }
         }
+    } catch (e) {
+        console.error("Fatal error in makeFakeData:", e);
+        errors.push("Fatal: " + e.message);
     }
 
     // Make sure we're signed in as admin at the end
     try {
-        await signInWithEmailAndPassword(auth, adminEmail, adminPassword);
+        if (auth.currentUser?.email !== adminEmail) {
+            await signInWithEmailAndPassword(auth, adminEmail, adminPassword);
+        }
     } catch (e) {
         console.error("Error signing back as admin:", e);
     }
