@@ -299,7 +299,7 @@ export async function makeFakeData(adminEmail, adminPassword) {
             } catch (error) {
                 if (error.code === "auth/email-already-in-use") {
                     skipped++;
-                    // Find existing employee doc to update payroll
+                    // 1. Try to find existing employee doc
                     const q = query(collection(db, "employees"));
                     const querySnapshot = await getDocs(q);
                     querySnapshot.forEach((doc) => {
@@ -307,6 +307,42 @@ export async function makeFakeData(adminEmail, adminPassword) {
                             employeeDocId = doc.id;
                         }
                     });
+
+                    // 2. If no employee doc found (Orphaned Auth User), recreate it
+                    if (!employeeDocId) {
+                        try {
+                            // Login as the user to get UID
+                            const userCred = await signInWithEmailAndPassword(auth, emp.email, DEMO_PASSWORD);
+                            const existUser = userCred.user;
+
+                            // Recreate User Profile
+                            await setDoc(doc(db, "users", existUser.uid), {
+                                email: emp.email,
+                                role: "employee",
+                                name: emp.name,
+                                createdAt: serverTimestamp()
+                            });
+
+                            // Recreate Employee Doc
+                            const empRef = await addDoc(collection(db, "employees"), {
+                                name: emp.name,
+                                dept: emp.dept,
+                                empId: emp.empId,
+                                post: emp.post,
+                                email: emp.email,
+                                uid: existUser.uid,
+                                time: serverTimestamp()
+                            });
+                            employeeDocId = empRef.id;
+
+                            // Sign back in as admin to prepare for next loop/steps
+                            await signInWithEmailAndPassword(auth, adminEmail, adminPassword);
+
+                        } catch (recError) {
+                            console.error("Recovery error for " + emp.email + ":", recError);
+                            errors.push("Recovery failed for " + emp.email);
+                        }
+                    }
                 } else {
                     console.error("Error creating " + emp.email + ":", error.message);
                     errors.push(emp.email + ": " + error.message);
