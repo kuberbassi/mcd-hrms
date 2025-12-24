@@ -101,7 +101,7 @@ function App() {
       case "dashboard":
         return <Dashboard role={role} user={user} setTab={setActiveTab} />;
       case "employees":
-        return <Employees role={role} />;
+        return <Employees role={role} user={user} />;
       case "attendance":
         return <Attendance role={role} user={user} />;
       case "payroll":
