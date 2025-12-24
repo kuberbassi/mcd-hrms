@@ -1,8 +1,13 @@
 import { useState, useEffect } from "react";
 import { showStaff, getPayrollData, updatePayroll, getMyPayroll } from "../backend";
 
-function Payroll({ role, user }) {
-    const [employees, setEmployees] = useState([]);
+function Payroll({ role, user, hrPerms }) {
+    const [employees, setEmployees] = useState([]); // Need to load staff for management view!
+
+    // Add loadStaff function if not present or just use showStaff
+    function loadStaff() {
+        showStaff(setEmployees);
+    }
     const [payrollData, setPayrollData] = useState({});
     const [editingId, setEditingId] = useState(null);
     const [saving, setSaving] = useState(false);
@@ -26,10 +31,13 @@ function Payroll({ role, user }) {
     }, [role]);
 
     useEffect(() => {
-        if ((role === "employee" || role === "hr") && user) {
+        if ((role === "employee" || (role === "hr" && !hrPerms?.managePayroll)) && user) { // If HR & !Manage => Personal
             loadMyPayroll();
         }
-    }, [role, user]);
+        if (role === "admin" || (role === "hr" && hrPerms?.managePayroll)) { // If HR & Manage => Admin View
+            loadStaff();
+        }
+    }, [role, user, hrPerms]);
 
     async function loadPayroll() {
         const data = await getPayrollData();
@@ -69,7 +77,7 @@ function Payroll({ role, user }) {
         return (data.basic || 0) + (data.da || 0) + (data.hra || 0);
     }
 
-    if (role === "employee" || role === "hr") {
+    if (role === "employee" || (role === "hr" && !hrPerms?.managePayroll)) {
         return (
             <div>
                 <h4 className="fw-bold mb-4">💰 My Salary</h4>

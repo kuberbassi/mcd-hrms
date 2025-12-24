@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { showStaff, markAttendance, resetAttendance, getAttendanceForDate, getMyAttendanceHistory } from "../backend";
 
-function Attendance({ role, user }) {
+function Attendance({ role, user, hrPerms }) {
     const [employees, setEmployees] = useState([]);
     const [attendance, setAttendance] = useState({});
     const [date, setDate] = useState(new Date().toISOString().split("T")[0]);
@@ -9,7 +9,7 @@ function Attendance({ role, user }) {
     const [myHistory, setMyHistory] = useState([]);
 
     useEffect(() => {
-        if (role === "admin" || role === "hr") {
+        if (role === "admin" || (role === "hr" && hrPerms?.viewEmployees)) { // Use viewEmployees for reading list
             const unsubscribe = showStaff((list) => {
                 setEmployees(list);
             });
@@ -20,10 +20,10 @@ function Attendance({ role, user }) {
     }, [role]);
 
     useEffect(() => {
-        if (role === "admin" || role === "hr") {
+        if (role === "admin" || (role === "hr" && hrPerms?.markAttendance)) { // Use markAttendance for reading daily log
             loadAttendance();
         }
-    }, [date, role]);
+    }, [date, role, hrPerms]);
 
     useEffect(() => {
         if (role === "employee" && user) {
@@ -42,7 +42,7 @@ function Attendance({ role, user }) {
     }
 
     async function handleMark(empId, status) {
-        if (role !== "admin" && role !== "hr") return;
+        if (role !== "admin" && !(role === "hr" && hrPerms?.markAttendance)) return;
         setSaving(true);
         try {
             await markAttendance(empId, date, status);
@@ -56,7 +56,7 @@ function Attendance({ role, user }) {
     }
 
     async function handleReset(empId) {
-        if (role !== "admin" && role !== "hr") return;
+        if (role !== "admin" && !(role === "hr" && hrPerms?.markAttendance)) return;
         if (!window.confirm("Reset attendance for this employee on " + date + "?")) return;
 
         setSaving(true);

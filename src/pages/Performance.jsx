@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { showStaff, getPerformanceData, savePerformance, getMyProfile } from "../backend";
 
-function Performance({ role, user }) {
+function Performance({ role, user, hrPerms }) {
     const [employees, setEmployees] = useState([]); // List of employees to manage
     const [myProfile, setMyProfile] = useState(null); // Own profile for "My Performance"
     const [ratings, setRatings] = useState({});
@@ -20,8 +20,8 @@ function Performance({ role, user }) {
             });
         }
 
-        // 2. Fetch staff list (for Admin & HR)
-        if (role === "admin" || role === "hr") {
+        // 2. Fetch staff list (for Admin & HR w/ Access)
+        if (role === "admin" || (role === "hr" && hrPerms?.viewEmployees)) {
             unsubscribe = showStaff((list) => {
                 setEmployees(list);
             });
@@ -42,7 +42,7 @@ function Performance({ role, user }) {
     }
 
     async function handleRate(empId, rating, comment) {
-        if (role !== "admin" && role !== "hr") return;
+        if (role !== "admin" && !(role === "hr" && hrPerms?.viewEmployees)) return;
         setSaving(true);
 
         try {
@@ -78,7 +78,7 @@ function Performance({ role, user }) {
         return { label: "Needs Improvement", color: "bg-danger bg-opacity-10 text-danger", icon: "⚠️" };
     }
 
-    const canManage = role === "admin" || role === "hr";
+    const canManage = role === "admin" || (role === "hr" && hrPerms?.viewEmployees);
 
     // Reusable Card Component
     const PerformanceCard = ({ emp, isManagementView }) => {
