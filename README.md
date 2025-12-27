@@ -52,6 +52,22 @@ To deploy updates:
    firebase deploy
    ```
 
+
+## 🧪 Testing Credentials
+
+Use these credentials to test different roles in the application.
+
+### 🔑 Admin Access
+- **Main Admin**: `admin@mcd.in`
+  - **Password**: `12345678`
+- **Office Manager (Admin)**: `vikram@mcd.in`
+  - **Password**: `demo123`
+
+### 👤 Employee Access
+- **Developer**: `raj@mcd.in` (Password: `demo123`)
+- **HR Manager**: `sonia@mcd.in` (Password: `demo123`)
+- **Accountant**: `amit@mcd.in` (Password: `demo123`)
+
 ## 👥 Team
 - **Bhaskar & Smarth**: Frontend
 - **Kuber & Smarth**: Backend

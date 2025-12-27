@@ -246,7 +246,7 @@ function Performance({ role, user }) {
                 </div>
             )}
 
-            <style jsx>{`
+            <style>{`
                 .hover-shadow:hover { transform: translateY(-3px); box-shadow: 0 10px 20px rgba(0,0,0,0.05) !important; }
                 .group:hover .group-hover-opacity-100 { opacity: 1 !important; }
                 .transition-all { transition: all 0.2s ease; }
