@@ -3,47 +3,52 @@ rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
 
-    // Users - allow read/write for authenticated users (needed for role management)
+    // Users
     match /users/{userId} {
       allow read, write: if request.auth != null;
     }
 
-    // System Config - allow read/write for authenticated users (needed for HR settings)
+    // System Config
     match /system/{docId} {
       allow read, write: if request.auth != null;
     }
 
-    // Employees - logged in users can read/write
+    // Employees
     match /employees/{docId} {
       allow read, write: if request.auth != null;
     }
 
-    // Attendance - logged in users can read/write
+    // Attendance
     match /attendance/{docId} {
       allow read, write: if request.auth != null;
     }
 
-    // Transfers - logged in users can read/write
+    // Transfers
     match /transfers/{docId} {
       allow read, write: if request.auth != null;
     }
 
-    // Payroll - logged in users can read/write
+    // Payroll
     match /payroll/{docId} {
       allow read, write: if request.auth != null;
     }
 
-    // Performance - logged in users can read/write
+    // Performance
     match /performance/{docId} {
       allow read, write: if request.auth != null;
     }
 
-    // Grievances - logged in users can read/write
+    // Grievances
     match /grievances/{docId} {
       allow read, write: if request.auth != null;
     }
 
-    // Deny all other access
+    // Tasks (Fixes the "Missing Permissions" error)
+    match /tasks/{taskId} {
+      allow read, write: if request.auth != null;
+    }
+
+    // Default: Deny everything else for security
     match /{document=**} {
       allow read, write: if false;
     }

@@ -14,6 +14,7 @@ import Payroll from "./pages/Payroll";
 import Performance from "./pages/Performance";
 import Grievances from "./pages/Grievances";
 import Settings from "./pages/Settings";
+import Tasks from "./pages/Tasks";
 
 const THEME = {
   primary: "#1a237e",
@@ -73,6 +74,8 @@ function App() {
       tabs.push({ id: "attendance", label: "My Attendance", icon: "✓" });
     }
 
+    tabs.push({ id: "tasks", label: role === "admin" ? "Assign Tasks" : "My Tasks", icon: "📝" });
+
     if (role === "admin") {
       tabs.push({ id: "payroll", label: "Payroll", icon: "💰" });
     } else {
@@ -104,6 +107,8 @@ function App() {
         return <Employees role={role} user={user} />;
       case "attendance":
         return <Attendance role={role} user={user} />;
+      case "tasks":
+        return <Tasks role={role} user={user} />;
       case "payroll":
         return <Payroll role={role} user={user} />;
       case "transfers":
@@ -156,7 +161,6 @@ function App() {
 
   return (
     <div className="min-vh-100 d-flex flex-column" style={{ backgroundColor: THEME.bg, paddingBottom: "80px" }}>
-      {/* Mobile Header with Hamburger */}
       <nav className="navbar navbar-dark shadow-sm sticky-top d-md-none" style={{ backgroundColor: THEME.primary }}>
         <div className="container-fluid px-3">
           <button className="btn btn-link text-white p-0" onClick={() => setMobileMenuOpen(!mobileMenuOpen)}>
@@ -177,7 +181,6 @@ function App() {
         </div>
       </nav>
 
-      {/* Mobile Slide-out Menu */}
       {mobileMenuOpen && (
         <>
           <div className="position-fixed top-0 start-0 w-100 h-100 bg-dark bg-opacity-50 d-md-none" style={{ zIndex: 1040 }} onClick={() => setMobileMenuOpen(false)}></div>
@@ -207,7 +210,6 @@ function App() {
         </>
       )}
 
-      {/* Desktop Header */}
       <nav className="navbar navbar-expand-lg navbar-dark shadow-sm py-3 d-none d-md-flex" style={{ backgroundColor: THEME.primary }}>
         <div className="container px-4">
           <span className="navbar-brand d-flex align-items-center fw-bold">
@@ -233,7 +235,6 @@ function App() {
         </div>
       </nav>
 
-      {/* Desktop Tab Navigation */}
       <div className="bg-white border-bottom shadow-sm sticky-top d-none d-md-block">
         <div className="container px-4 py-2">
           <div className="d-flex overflow-auto gap-2" style={{ scrollbarWidth: "none" }}>
@@ -254,17 +255,14 @@ function App() {
         </div>
       </div>
 
-      {/* Page Content */}
       <div className="container px-3 px-md-4 py-3 py-md-5">
         {renderPage()}
       </div>
 
-      {/* Footer */}
       <footer className="text-center py-4 text-muted small mt-auto" style={{ borderTop: "1px solid rgba(0,0,0,0.05)" }}>
         <p className="mb-0">© {new Date().getFullYear()} Municipal Corporation of Delhi. All rights reserved.</p>
       </footer>
 
-      {/* Mobile Bottom Navigation */}
       <div className="fixed-bottom bg-white border-top shadow d-md-none" style={{ zIndex: 1000 }}>
         <div className="d-flex justify-content-around py-2">
           {tabs.slice(0, 4).map((tab) => (
