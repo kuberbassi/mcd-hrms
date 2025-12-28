@@ -17,7 +17,7 @@ import {
     setDoc,
     getDocs,
     updateDoc,
-    where 
+    where
 } from "firebase/firestore";
 import { auth, db } from "./firebase";
 
@@ -195,7 +195,7 @@ export async function makeFakeData(adminEmail, adminPassword) {
             }
         }
     } catch (e) { console.error("Fatal error:", e); errors.push("Fatal: " + e.message); }
-    try { if (auth.currentUser?.email !== adminEmail) await signInWithEmailAndPassword(auth, adminEmail, adminPassword); } catch (e) {}
+    try { if (auth.currentUser?.email !== adminEmail) await signInWithEmailAndPassword(auth, adminEmail, adminPassword); } catch (e) { }
     return { created, skipped, errors };
 }
 
@@ -305,7 +305,7 @@ export async function resolveGrievance(id) {
     await updateDoc(doc(db, "grievances", id), { status: "resolved", resolvedAt: serverTimestamp() });
 }
 
-// ============ TASKS MANAGEMENT ============
+// Task Management
 
 // 1. Create a new task (Admin only)
 export const assignTask = async (taskData) => {
@@ -339,7 +339,7 @@ export const getAllTasks = async () => {
 export const getEmployeeTasks = async (employeeEmail) => {
     try {
         const q = query(
-            collection(db, "tasks"), 
+            collection(db, "tasks"),
             where("assignedTo", "==", employeeEmail)
         );
         const snapshot = await getDocs(q);
@@ -349,7 +349,7 @@ export const getEmployeeTasks = async (employeeEmail) => {
                 const dateA = a.createdAt?.toMillis() || 0;
                 const dateB = b.createdAt?.toMillis() || 0;
                 return dateB - dateA;
-            }); 
+            });
     } catch (error) {
         console.error("Error fetching employee tasks:", error);
         return [];
@@ -370,3 +370,85 @@ export const updateTaskStatus = async (taskId, status, notes) => {
         return { success: false, error };
     }
 };
+
+// Recruitment Module
+
+// 1. Create a Job Posting (Admin/HR)
+export async function createJobPosting(jobData) {
+    try {
+        await addDoc(collection(db, "jobs"), {
+            ...jobData,
+            status: "open",
+            createdAt: serverTimestamp()
+        });
+        return { success: true };
+    } catch (error) {
+        console.error("Error creating job:", error);
+        return { success: false, error };
+    }
+}
+
+// 2. Get Job Postings (Admin/HR - All jobs; Public - Open jobs)
+export async function getJobPostings(isAdmin = false) {
+    try {
+        let q;
+        if (isAdmin) {
+            q = query(collection(db, "jobs"), orderBy("createdAt", "desc"));
+        } else {
+            q = query(
+                collection(db, "jobs"),
+                where("status", "==", "open"),
+                orderBy("createdAt", "desc")
+            );
+        }
+        const snapshot = await getDocs(q);
+        return snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+    } catch (error) {
+        console.error("Error fetching jobs:", error);
+        // Fallback for public view if index missing (or simply return empty)
+        return [];
+    }
+}
+
+// 3. Delete Job Posting (Admin/HR)
+export async function deleteJobPosting(jobId) {
+    try {
+        await deleteDoc(doc(db, "jobs", jobId));
+        return { success: true };
+    } catch (error) {
+        console.error("Error deleting job:", error);
+        return { success: false, error };
+    }
+}
+
+// 4. Submit Application (Candidate)
+export async function submitApplication(applicationData) {
+    try {
+        await addDoc(collection(db, "applications"), {
+            ...applicationData,
+            status: "new",
+            submittedAt: serverTimestamp()
+        });
+        return { success: true };
+    } catch (error) {
+        console.error("Error submitting application:", error);
+        return { success: false, error };
+    }
+}
+
+// 5. Get Applications (Admin/HR)
+export async function getApplications(jobId = null) {
+    try {
+        let q;
+        if (jobId) {
+            q = query(collection(db, "applications"), where("jobId", "==", jobId), orderBy("submittedAt", "desc"));
+        } else {
+            q = query(collection(db, "applications"), orderBy("submittedAt", "desc"));
+        }
+        const snapshot = await getDocs(q);
+        return snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+    } catch (error) {
+        console.error("Error fetching applications:", error);
+        return [];
+    }
+}

@@ -1,12 +1,13 @@
 # MCD HRMS
 
-A modern Employee Management System built for the Municipal Corporation of Delhi.
+This is the Employee Management System we made for the Municipal Corporation of Delhi.
 
-## 🚀 Features
+## What it does
 
-- **Employee Dashboard**: View attendance, salary, and profile.
-- **HR Tools**: Manage employees, mark attendance, and view analytics.
-- **Admin Control**: Full system access and configuration.
+- **Hiring**: We can post jobs and see who applied.
+- **Employees**: Check attendance, salary, and details.
+- **HR Work**: Add staff, mark attendance, and see reports.
+- **Admin**: Control everything in the app.
 
 ## 🛠️ Getting Started
 
@@ -36,19 +37,17 @@ A modern Employee Management System built for the Municipal Corporation of Delhi
    ```
    Open the link shown in the terminal (usually `http://localhost:5173`).
 
-## ☁️ Deployment
+## How to Update
 
-This project is deployed on **Firebase**.
+This app runs on **Firebase**.
 
-To deploy updates:
-1. Build the project:
+To put new changes online:
+1. Make the build folder:
    ```bash
    npm run build
    ```
-2. Deploy to Firebase:
+2. Send it to Firebase:
    ```bash
-   npm install -g firebase-tools
-   firebase login
    firebase deploy
    ```
 
@@ -69,7 +68,6 @@ Use these credentials to test different roles in the application.
 - **Accountant**: `amit@mcd.in` (Password: `demo123`)
 
 ## 👥 Team
-- **Bhaskar & Smarth**: Frontend
-- **Kuber & Smarth**: Backend
-- **Kuber**: Design
-- **Akshara**: Testing & QA
+- **Smarth & Kuber**: Frontend Development
+- **Kuber**: UI/UX, Backend & Documentation
+- **Akshara & Bhaskar**: PPT, Testing, Improvements & Ideas

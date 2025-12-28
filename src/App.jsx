@@ -14,7 +14,11 @@ import Payroll from "./pages/Payroll";
 import Performance from "./pages/Performance";
 import Grievances from "./pages/Grievances";
 import Settings from "./pages/Settings";
+
 import Tasks from "./pages/Tasks";
+import JobPostings from "./pages/Recruitment/JobPostings";
+import Applications from "./pages/Recruitment/Applications";
+import Careers from "./pages/Recruitment/Careers";
 
 const THEME = {
   primary: "#1a237e",
@@ -29,7 +33,9 @@ function App() {
   const [user, setUser] = useState(null);
   const [role, setRole] = useState("employee");
   const [activeTab, setActiveTab] = useState("dashboard");
+
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [showCareers, setShowCareers] = useState(false);
 
   useEffect(() => {
     const unsubscribe = checkUser((currentUser, userRole) => {
@@ -64,9 +70,12 @@ function App() {
     }
   }
 
+  // --- Navigation Logic ---
+
   function getTabs() {
     const tabs = [{ id: "dashboard", label: "Dashboard", icon: "🏠" }];
 
+    // Core HR Functions
     if (role === "admin" || role === "hr") {
       tabs.push({ id: "employees", label: "Employees", icon: "👥" });
       tabs.push({ id: "attendance", label: "Attendance", icon: "✓" });
@@ -76,16 +85,46 @@ function App() {
 
     tabs.push({ id: "tasks", label: role === "admin" ? "Assign Tasks" : "My Tasks", icon: "📝" });
 
-    if (role === "admin") {
-      tabs.push({ id: "payroll", label: "Payroll", icon: "💰" });
-    } else {
-      tabs.push({ id: "payroll", label: "My Salary", icon: "💰" });
+    // Group 1: Recruitment (Admin/HR)
+    if (role === "admin" || role === "hr") {
+      tabs.push({
+        id: "recruitment",
+        label: "Recruitment",
+        icon: "📢",
+        children: [
+          { id: "jobs", label: "Job Postings", icon: "📢" },
+          { id: "applications", label: "Applications", icon: "📥" }
+        ]
+      });
     }
 
-    tabs.push({ id: "performance", label: role === "admin" ? "Performance" : "My Performance", icon: "📊" });
+    // Group 2: Workforce / Personal (Payroll & Performance)
+    if (role === "admin") {
+      tabs.push({
+        id: "workforce",
+        label: "Workforce",
+        icon: "💼",
+        children: [
+          { id: "payroll", label: "Payroll", icon: "💰" },
+          { id: "performance", label: "Performance", icon: "📊" }
+        ]
+      });
+    } else {
+      // For employees, keep them separate or group them as "My Records"
+      tabs.push({ id: "payroll", label: "My Salary", icon: "💰" });
+      tabs.push({ id: "performance", label: "My Performance", icon: "📊" });
+    }
 
-    tabs.push({ id: "transfers", label: role === "admin" ? "Transfers" : "Transfer Request", icon: "📋" });
-    tabs.push({ id: "grievances", label: role === "admin" ? "Grievances" : "Submit Complaint", icon: "💬" });
+    // Group 3: Requests & Grievances
+    tabs.push({
+      id: "requests",
+      label: "Requests",
+      icon: "💬",
+      children: [
+        { id: "transfers", label: role === "admin" ? "Transfers" : "Transfer Request", icon: "📋" },
+        { id: "grievances", label: role === "admin" ? "Grievances" : "Submit Complaint", icon: "⚠️" } // Changed icon
+      ]
+    });
 
     if (role === "admin") {
       tabs.push({ id: "settings", label: "Settings", icon: "⚙️" });
@@ -101,32 +140,32 @@ function App() {
 
   function renderPage() {
     switch (activeTab) {
-      case "dashboard":
-        return <Dashboard role={role} user={user} setTab={setActiveTab} />;
-      case "employees":
-        return <Employees role={role} user={user} />;
-      case "attendance":
-        return <Attendance role={role} user={user} />;
-      case "tasks":
-        return <Tasks role={role} user={user} />;
-      case "payroll":
-        return <Payroll role={role} user={user} />;
-      case "transfers":
-        return <Transfers role={role} user={user} />;
-      case "performance":
-        return <Performance role={role} user={user} />;
-      case "grievances":
-        return <Grievances role={role} user={user} />;
-      case "settings":
-        return <Settings />;
-      default:
-        return <Dashboard role={role} user={user} setTab={setActiveTab} />;
+      case "dashboard": return <Dashboard role={role} user={user} setTab={setActiveTab} />;
+      case "employees": return <Employees role={role} user={user} />;
+      case "attendance": return <Attendance role={role} user={user} />;
+      case "tasks": return <Tasks role={role} user={user} />;
+      case "payroll": return <Payroll role={role} user={user} />;
+      case "transfers": return <Transfers role={role} user={user} />;
+      case "performance": return <Performance role={role} user={user} />;
+      case "grievances": return <Grievances role={role} user={user} />;
+      case "settings": return <Settings />;
+      case "jobs": return <JobPostings />;
+      case "applications": return <Applications />;
+      default: return <Dashboard role={role} user={user} setTab={setActiveTab} />;
     }
+  }
+
+  // Helper to check if a group is active
+  const isGroupActive = (tab) => tab.children?.some(child => child.id === activeTab);
+
+  if (showCareers) {
+    return <Careers onBack={() => setShowCareers(false)} />;
   }
 
   if (!isLoggedIn) {
     return (
       <div className="min-vh-100 d-flex align-items-center justify-content-center" style={{ background: `linear-gradient(135deg, ${THEME.primary} 0%, #283593 100%)` }}>
+        {/* Login Form Code (Unchanged) */}
         <div className="container">
           <div className="row justify-content-center">
             <div className="col-11 col-sm-10 col-md-8 col-lg-5">
@@ -147,6 +186,11 @@ function App() {
                       <input type="password" name="password" className="form-control form-control-lg" placeholder="Enter password" required />
                     </div>
                     <button type="submit" className="btn btn-primary btn-lg w-100 fw-bold">Sign In</button>
+                    <div className="text-center mt-3">
+                      <button type="button" className="btn btn-link text-decoration-none" onClick={() => setShowCareers(true)}>
+                        Looking for a job? View Careers
+                      </button>
+                    </div>
                   </form>
                 </div>
               </div>
@@ -159,8 +203,67 @@ function App() {
 
   const tabs = getTabs();
 
+  // Desktop Dropdown Component
+  const NavItem = ({ tab }) => {
+    const [isOpen, setIsOpen] = useState(false);
+    const isActive = activeTab === tab.id || isGroupActive(tab);
+
+    if (tab.children) {
+      return (
+        <div
+          className="position-relative d-inline-block"
+          onMouseEnter={() => setIsOpen(true)}
+          onMouseLeave={() => setIsOpen(false)}
+        >
+          <button
+            className={`btn px-4 py-2 rounded-pill fw-medium border-0 d-flex align-items-center gap-2 ${isActive ? "text-white shadow-sm" : "text-muted"}`}
+            style={{
+              backgroundColor: isActive ? THEME.primary : "#f1f3f5",
+              transition: "all 0.2s ease"
+            }}
+          >
+            {tab.label} <small>▼</small>
+          </button>
+          {isOpen && (
+            <div className="position-absolute start-0 mt-1 bg-white shadow-lg rounded-3 border overflow-hidden" style={{ minWidth: "200px", zIndex: 1000 }}>
+              {tab.children.map(child => (
+                <button
+                  key={child.id}
+                  className="dropdown-item p-3 d-flex align-items-center gap-2"
+                  onClick={() => switchTab(child.id)}
+                  style={{
+                    backgroundColor: activeTab === child.id ? "#f8f9fa" : "white",
+                    color: activeTab === child.id ? THEME.primary : "#333",
+                    fontWeight: activeTab === child.id ? "bold" : "normal"
+                  }}
+                >
+                  <span>{child.icon}</span>
+                  <span>{child.label}</span>
+                </button>
+              ))}
+            </div>
+          )}
+        </div>
+      );
+    }
+
+    return (
+      <button
+        className={`btn px-4 py-2 rounded-pill fw-medium border-0 ${isActive ? "text-white shadow-sm" : "text-muted"}`}
+        style={{
+          backgroundColor: isActive ? THEME.primary : "#f1f3f5",
+          transition: "all 0.2s ease"
+        }}
+        onClick={() => switchTab(tab.id)}
+      >
+        {tab.label}
+      </button>
+    );
+  };
+
   return (
     <div className="min-vh-100 d-flex flex-column" style={{ backgroundColor: THEME.bg, paddingBottom: "80px" }}>
+      {/* Mobile Top Bar */}
       <nav className="navbar navbar-dark shadow-sm sticky-top d-md-none" style={{ backgroundColor: THEME.primary }}>
         <div className="container-fluid px-3">
           <button className="btn btn-link text-white p-0" onClick={() => setMobileMenuOpen(!mobileMenuOpen)}>
@@ -181,6 +284,7 @@ function App() {
         </div>
       </nav>
 
+      {/* Mobile Drawer */}
       {mobileMenuOpen && (
         <>
           <div className="position-fixed top-0 start-0 w-100 h-100 bg-dark bg-opacity-50 d-md-none" style={{ zIndex: 1040 }} onClick={() => setMobileMenuOpen(false)}></div>
@@ -195,21 +299,38 @@ function App() {
             </div>
             <div className="list-group list-group-flush">
               {tabs.map((tab) => (
-                <button
-                  key={tab.id}
-                  className={`list-group-item list-group-item-action border-0 py-3 d-flex align-items-center ${activeTab === tab.id ? "active" : ""}`}
-                  onClick={() => switchTab(tab.id)}
-                  style={{ backgroundColor: activeTab === tab.id ? THEME.primary : "transparent", color: activeTab === tab.id ? "white" : THEME.text }}
-                >
-                  <span className="me-3" style={{ fontSize: "1.2rem" }}>{tab.icon}</span>
-                  <span className="fw-medium">{tab.label}</span>
-                </button>
+                tab.children ? (
+                  <div key={tab.id} className="border-bottom">
+                    <div className="px-3 py-2 bg-light text-muted small fw-bold text-uppercase">{tab.label}</div>
+                    {tab.children.map(child => (
+                      <button
+                        key={child.id}
+                        className={`list-group-item list-group-item-action border-0 py-3 d-flex align-items-center ${activeTab === child.id ? "active" : ""}`}
+                        onClick={() => switchTab(child.id)}
+                      >
+                        <span className="me-3" style={{ fontSize: "1.2rem" }}>{child.icon}</span>
+                        <span className="fw-medium">{child.label}</span>
+                      </button>
+                    ))}
+                  </div>
+                ) : (
+                  <button
+                    key={tab.id}
+                    className={`list-group-item list-group-item-action border-0 py-3 d-flex align-items-center ${activeTab === tab.id ? "active" : ""}`}
+                    onClick={() => switchTab(tab.id)}
+                    style={{ backgroundColor: activeTab === tab.id ? THEME.primary : "transparent", color: activeTab === tab.id ? "white" : THEME.text }}
+                  >
+                    <span className="me-3" style={{ fontSize: "1.2rem" }}>{tab.icon}</span>
+                    <span className="fw-medium">{tab.label}</span>
+                  </button>
+                )
               ))}
             </div>
           </div>
         </>
       )}
 
+      {/* Desktop Top Bar */}
       <nav className="navbar navbar-expand-lg navbar-dark shadow-sm py-3 d-none d-md-flex" style={{ backgroundColor: THEME.primary }}>
         <div className="container px-4">
           <span className="navbar-brand d-flex align-items-center fw-bold">
@@ -235,51 +356,49 @@ function App() {
         </div>
       </nav>
 
+      {/* Desktop Navigation Bar (Secondary) */}
       <div className="bg-white border-bottom shadow-sm sticky-top d-none d-md-block">
         <div className="container px-4 py-2">
-          <div className="d-flex overflow-auto gap-2" style={{ scrollbarWidth: "none" }}>
+          {/* Changed overflow-auto to allow dropdowns to spill over, or handle z-index carefully */}
+          <div className="d-flex flex-wrap gap-2">
             {tabs.map((tab) => (
-              <button
-                key={tab.id}
-                className={`btn px-4 py-2 rounded-pill fw-medium border-0 ${activeTab === tab.id ? "text-white shadow-sm" : "text-muted"}`}
-                style={{
-                  backgroundColor: activeTab === tab.id ? THEME.primary : "#f1f3f5",
-                  transition: "all 0.2s ease"
-                }}
-                onClick={() => setActiveTab(tab.id)}
-              >
-                {tab.label}
-              </button>
+              <NavItem key={tab.id} tab={tab} />
             ))}
           </div>
         </div>
       </div>
 
+      {/* Main Content */}
       <div className="container px-3 px-md-4 py-3 py-md-5">
         {renderPage()}
       </div>
 
+      {/* Footer */}
       <footer className="text-center py-4 text-muted small mt-auto" style={{ borderTop: "1px solid rgba(0,0,0,0.05)" }}>
         <p className="mb-0">© {new Date().getFullYear()} Municipal Corporation of Delhi. All rights reserved.</p>
       </footer>
 
+      {/* Mobile Bottom Bar (Simplified - top 4 items only as shortcuts) */}
       <div className="fixed-bottom bg-white border-top shadow d-md-none" style={{ zIndex: 1000 }}>
         <div className="d-flex justify-content-around py-2">
           {tabs.slice(0, 4).map((tab) => (
-            <button
-              key={tab.id}
-              className="btn btn-link text-decoration-none flex-fill p-2"
-              onClick={() => switchTab(tab.id)}
-              style={{
-                color: activeTab === tab.id ? THEME.primary : "#adb5bd",
-                borderBottom: activeTab === tab.id ? `3px solid ${THEME.primary}` : "3px solid transparent"
-              }}
-            >
-              <div className="d-flex flex-column align-items-center">
-                <span style={{ fontSize: "1.3rem" }}>{tab.icon}</span>
-                <span style={{ fontSize: "0.65rem", marginTop: "2px" }}>{tab.label.split(" ")[0]}</span>
-              </div>
-            </button>
+            /* Simplify mobile bottom bar to only show direct links, ignore groups for simplicity or show first child */
+            !tab.children ? (
+              <button
+                key={tab.id}
+                className="btn btn-link text-decoration-none flex-fill p-2"
+                onClick={() => switchTab(tab.id)}
+                style={{
+                  color: activeTab === tab.id ? THEME.primary : "#adb5bd",
+                  borderBottom: activeTab === tab.id ? `3px solid ${THEME.primary}` : "3px solid transparent"
+                }}
+              >
+                <div className="d-flex flex-column align-items-center">
+                  <span style={{ fontSize: "1.3rem" }}>{tab.icon}</span>
+                  <span style={{ fontSize: "0.65rem", marginTop: "2px" }}>{tab.label.split(" ")[0]}</span>
+                </div>
+              </button>
+            ) : null
           ))}
         </div>
       </div>
