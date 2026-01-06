@@ -57,8 +57,14 @@ function App() {
     try {
       await firebaseLogin(email, password);
     } catch (error) {
-      console.error("Login error:", error);
-      alert("Login failed: " + error.message);
+      // console.error("Login error:", error); // Suppress console error as requested
+      let message = "Login failed. Please check your credentials.";
+      if (error.code === "auth/invalid-credential" || error.code === "auth/user-not-found" || error.code === "auth/wrong-password") {
+        message = "Invalid email or password.";
+      } else if (error.code === "auth/too-many-requests") {
+        message = "Too many failed attempts. Please try again later.";
+      }
+      alert(message);
     }
   }
 
