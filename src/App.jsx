@@ -207,13 +207,25 @@ function App() {
   const NavItem = ({ tab }) => {
     const [isOpen, setIsOpen] = useState(false);
     const isActive = activeTab === tab.id || isGroupActive(tab);
+    let timeoutId;
+
+    const handleMouseEnter = () => {
+      if (timeoutId) clearTimeout(timeoutId);
+      setIsOpen(true);
+    };
+
+    const handleMouseLeave = () => {
+      timeoutId = setTimeout(() => {
+        setIsOpen(false);
+      }, 300); // 300ms delay
+    };
 
     if (tab.children) {
       return (
         <div
           className="position-relative d-inline-block"
-          onMouseEnter={() => setIsOpen(true)}
-          onMouseLeave={() => setIsOpen(false)}
+          onMouseEnter={handleMouseEnter}
+          onMouseLeave={handleMouseLeave}
         >
           <button
             className={`btn px-4 py-2 rounded-pill fw-medium border-0 d-flex align-items-center gap-2 ${isActive ? "text-white shadow-sm" : "text-muted"}`}
@@ -225,7 +237,12 @@ function App() {
             {tab.label} <small>▼</small>
           </button>
           {isOpen && (
-            <div className="position-absolute start-0 mt-1 bg-white shadow-lg rounded-3 border overflow-hidden" style={{ minWidth: "200px", zIndex: 1000 }}>
+            <div
+              className="position-absolute start-0 mt-1 bg-white shadow-lg rounded-3 border overflow-hidden"
+              style={{ minWidth: "200px", zIndex: 1000 }}
+              onMouseEnter={handleMouseEnter}
+              onMouseLeave={handleMouseLeave}
+            >
               {tab.children.map(child => (
                 <button
                   key={child.id}
