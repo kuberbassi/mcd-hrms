@@ -123,7 +123,16 @@ function Dashboard({ role, user, setTab }) {
                             <div className="col-md-4">
                                 <div className="card h-100 border-0 shadow-sm rounded-4 bg-danger bg-opacity-10 animate-slide-up" style={{ animationDelay: "0.35s" }}>
                                     <div className="card-body p-3">
-                                        <h6 className="fw-bold text-danger text-uppercase small ls-1 mb-2">Attendance Anomalies</h6>
+                                        <div className="d-flex justify-content-between align-items-start mb-2">
+                                            <h6 className="fw-bold text-danger text-uppercase small ls-1 mb-0">Attendance Anomalies</h6>
+                                            <span
+                                                className="text-danger opacity-50 cursor-pointer"
+                                                title="Anomalies include late marking, repeated absence, or supervisor overrides."
+                                                style={{ cursor: 'help' }}
+                                            >
+                                                ⓘ
+                                            </span>
+                                        </div>
                                         <div className="display-6 fw-bold text-danger">12</div>
                                         <small className="text-muted">High value for today</small>
                                     </div>
@@ -317,6 +326,11 @@ function Dashboard({ role, user, setTab }) {
                             </div>
                         </div>
                     </div>
+                </div>
+
+                {/* PILOT DISCLAIMER - User Request */}
+                <div className="text-center pb-4 opacity-50 small fst-italic mt-5">
+                    "Prototype demonstrated for pilot-level evaluation. Designed for phased integration with existing government systems."
                 </div>
             </div>
         );
