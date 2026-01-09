@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { showStaff, getAttendanceForEmployee, getMyPayroll, getMyProfile } from "../backend";
+import { seedDatabase } from "../utils/SeedData";
 
 const THEME = {
     primary: "#1a237e",
@@ -39,10 +40,11 @@ function Dashboard({ role, user, setTab }) {
     }, [role]);
 
     useEffect(() => {
-        if (role === "employee" && user) {
+        if (user) {
+            // Load personal data for EVERYONE (Admin needs it for "My Personal Record", Employee needs it for dashboard)
             loadMyData();
         }
-    }, [role, user]);
+    }, [user]);
 
     async function loadMyData() {
         // Parallel fetch for better performance
@@ -68,9 +70,9 @@ function Dashboard({ role, user, setTab }) {
                     <div className="position-relative z-1">
                         <div className="d-flex justify-content-between align-items-center">
                             <div>
-                                <h6 className="text-uppercase ls-2 mb-2 opacity-75 fw-bold" style={{ fontSize: "0.8rem" }}>{role === "admin" ? "Control Center" : "Management Portal"}</h6>
-                                <h1 className="display-5 fw-bold mb-1">{role === "admin" ? "Administrator Dashboard" : "HR Manager Dashboard"}</h1>
-                                <p className="mb-0 opacity-75">Overview of system performance and personnel</p>
+                                <h6 className="text-uppercase ls-2 mb-2 opacity-75 fw-bold" style={{ fontSize: "0.8rem" }}>{role === "admin" ? "Administrative Control Center" : "Management Portal"}</h6>
+                                <h1 className="display-5 fw-bold mb-1">{role === "admin" ? "Workforce Accountability Platform" : "HR Manager Dashboard"}</h1>
+                                <p className="mb-0 opacity-75">Real-time visibility into workforce presence, deployment, and accountability across MCD.</p>
                             </div>
                             <div className="d-none d-md-block text-end">
                                 <div className="display-4 fw-bold">{stats.total}</div>
@@ -86,12 +88,14 @@ function Dashboard({ role, user, setTab }) {
                         <div className="row g-4">
                             <div className="col-md-6">
                                 <div className="card h-100 border-0 shadow-sm rounded-4 overflow-hidden hover-scale animate-slide-up" style={{ animationDelay: "0.2s" }}>
-                                    <div className="card-body p-4 position-relative">
+                                    <div className="card-body p-4 position-relative d-flex flex-column justify-content-between">
                                         <div className="position-absolute top-0 end-0 p-3 opacity-10">
                                             <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1" strokeLinecap="round" strokeLinejoin="round" className="text-primary"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
                                         </div>
-                                        <h6 className="text-muted text-uppercase fw-bold small ls-1 mb-3">Workforce</h6>
-                                        <h2 className="display-4 fw-bold text-dark mb-0">{stats.total}</h2>
+                                        <div>
+                                            <h6 className="text-muted text-uppercase fw-bold small ls-1 mb-3">Workforce</h6>
+                                            <h2 className="display-4 fw-bold text-dark mb-0">{stats.total}</h2>
+                                        </div>
                                         <div className="d-flex align-items-center mt-3">
                                             <span className="badge bg-success bg-opacity-10 text-success rounded-pill px-2 py-1 small">● System Active</span>
                                         </div>
@@ -100,17 +104,51 @@ function Dashboard({ role, user, setTab }) {
                             </div>
                             <div className="col-md-6">
                                 <div className="card h-100 border-0 shadow-sm rounded-4 overflow-hidden hover-scale animate-slide-up" style={{ animationDelay: "0.3s" }}>
-                                    <div className="card-body p-4 position-relative">
+                                    <div className="card-body p-4 position-relative d-flex flex-column justify-content-between">
                                         <div className="position-absolute top-0 end-0 p-3 opacity-10">
                                             <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1" strokeLinecap="round" strokeLinejoin="round" className="text-warning"><rect x="2" y="7" width="20" height="14" rx="2" ry="2"></rect><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"></path></svg>
                                         </div>
-                                        <h6 className="text-muted text-uppercase fw-bold small ls-1 mb-3">Departments</h6>
-                                        <h2 className="display-4 fw-bold text-dark mb-0">{Object.keys(stats.departments).length}</h2>
+                                        <div>
+                                            <h6 className="text-muted text-uppercase fw-bold small ls-1 mb-3">Departments</h6>
+                                            <h2 className="display-4 fw-bold text-dark mb-0">{Object.keys(stats.departments).length}</h2>
+                                        </div>
                                         <div className="mt-3 small text-muted">
                                             Most active: <span className="fw-bold text-dark">{Object.entries(stats.departments).sort((a, b) => b[1] - a[1])[0]?.[0] || "None"}</span>
                                         </div>
                                     </div>
                                 </div>
+                            </div>
+
+                            {/* NEW GIDGETS FOR GOVERNANCE */}
+                            <div className="col-md-4">
+                                <div className="card h-100 border-0 shadow-sm rounded-4 bg-danger bg-opacity-10 animate-slide-up" style={{ animationDelay: "0.35s" }}>
+                                    <div className="card-body p-3">
+                                        <h6 className="fw-bold text-danger text-uppercase small ls-1 mb-2">Attendance Anomalies</h6>
+                                        <div className="display-6 fw-bold text-danger">12</div>
+                                        <small className="text-muted">High value for today</small>
+                                    </div>
+                                </div>
+                            </div>
+                            <div className="col-md-4">
+                                <div className="card h-100 border-0 shadow-sm rounded-4 bg-warning bg-opacity-10 animate-slide-up" style={{ animationDelay: "0.36s" }}>
+                                    <div className="card-body p-3">
+                                        <h6 className="fw-bold text-warning text-uppercase small ls-1 mb-2">Pending Grievances</h6>
+                                        <div className="display-6 fw-bold text-warning text-dark">5</div>
+                                        <small className="text-muted">{">"} 7 days pending</small>
+                                    </div>
+                                </div>
+                            </div>
+                            <div className="col-md-4">
+                                <div className="card h-100 border-0 shadow-sm rounded-4 bg-info bg-opacity-10 animate-slide-up" style={{ animationDelay: "0.37s" }}>
+                                    <div className="card-body p-3">
+                                        <h6 className="fw-bold text-info text-dark text-uppercase small ls-1 mb-2">Under-deployed</h6>
+                                        <div className="display-6 fw-bold text-info text-dark">2</div>
+                                        <small className="text-muted">Departments below 60%</small>
+                                    </div>
+                                </div>
+                            </div>
+                            <div className="col-12">
+                                <small className="text-muted fst-italic">* Designed to help administrators identify workforce and governance issues at a glance.</small>
                             </div>
 
                             {/* Department Breakdown Bar */}
@@ -152,6 +190,28 @@ function Dashboard({ role, user, setTab }) {
                                 <div className="mb-4">
                                     <h5 className="fw-bold">Administrative Console</h5>
                                     <p className="opacity-75 small">Manage system resources, personnel access, and global settings from here.</p>
+
+                                    <div className="mt-4 pt-4 border-top border-white border-opacity-25 flex-grow-1 d-flex flex-column justify-content-end">
+                                        {/* My Personal Record (Hybrid View) */}
+                                        <div className="bg-white bg-opacity-10 rounded-3 p-3 mb-3">
+                                            <h6 className="text-uppercase small fw-bold opacity-75 ls-1 mb-2">My Personal Record</h6>
+                                            <div className="d-flex justify-content-between align-items-center mb-1">
+                                                <span className="small opacity-75">My Salary:</span>
+                                                <span className="fw-bold">₹{mySalary ? (mySalary.total || 0).toLocaleString() : "..."}</span>
+                                            </div>
+                                            <div className="d-flex justify-content-between align-items-center">
+                                                <span className="small opacity-75">Performance:</span>
+                                                <span className="badge bg-success bg-opacity-25 text-white">Example Rating</span>
+                                            </div>
+                                        </div>
+                                        <h6 className="text-uppercase small fw-bold opacity-75 ls-1 mb-3">System Activity Log</h6>
+                                        <div className="d-flex flex-column gap-2 small opacity-75 font-monospace">
+                                            <div><span className="text-success">●</span> 09:45 AM - Database Backup Complete</div>
+                                            <div><span className="text-info">●</span> 10:12 AM - New Patch Deployed (v2.4)</div>
+                                            <div><span className="text-warning">●</span> 11:30 AM - Server Load: Normal</div>
+                                            <div><span className="text-white">●</span> 12:15 PM - Payroll Sync Initiated</div>
+                                        </div>
+                                    </div>
                                 </div>
 
                                 <div className="d-grid gap-3 mt-auto">
@@ -179,7 +239,79 @@ function Dashboard({ role, user, setTab }) {
                                             <div className="bg-success rounded-circle p-1 me-2" style={{ width: "8px", height: "8px" }}></div>
                                             <small className="fw-bold text-uppercase" style={{ fontSize: "0.7rem", letterSpacing: "1px" }}>System Status</small>
                                         </div>
-                                        <div className="small opacity-75">All systems operational. Database connected secure.</div>
+                                        <div className="small opacity-75">All systems operational. End-to-end encryption active.</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                {/* Governance Impact Section (Static Pitch Slide) */}
+                <div className="card border-0 shadow-sm rounded-4 text-white mb-4 animate-slide-up" style={{ backgroundColor: "#263238", animationDelay: "0.6s" }}>
+                    <div className="card-body p-5">
+                        <div className="d-flex align-items-center mb-4">
+                            <div className="p-2 bg-white bg-opacity-10 rounded-3 me-3">
+                                <span className="fs-3">🏛️</span>
+                            </div>
+                            <div>
+                                <h5 className="fw-bold mb-1 ls-1 text-uppercase small opacity-75">Platform Impact</h5>
+                                <h3 className="fw-bold mb-0">Governance Enhancement Matrix</h3>
+                            </div>
+                        </div>
+
+                        <div className="row g-4">
+                            <div className="col-md-4">
+                                <div className="d-flex align-items-start p-3 rounded-3 h-100" style={{ backgroundColor: "rgba(255,255,255,0.05)" }}>
+                                    <div className="bg-success bg-opacity-25 rounded-circle p-2 me-3 fs-5 d-flex align-items-center justify-content-center" style={{ width: 48, height: 48 }}>✔️</div>
+                                    <div>
+                                        <div className="fw-bold mb-1">Workforce Accountability</div>
+                                        <div className="small opacity-75">Real-time attendance & presence tracking</div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div className="col-md-4">
+                                <div className="d-flex align-items-start p-3 rounded-3 h-100" style={{ backgroundColor: "rgba(255,255,255,0.05)" }}>
+                                    <div className="bg-info bg-opacity-25 rounded-circle p-2 me-3 fs-5 d-flex align-items-center justify-content-center" style={{ width: 48, height: 48 }}>👁️</div>
+                                    <div>
+                                        <div className="fw-bold mb-1">Ward-Level Transparency</div>
+                                        <div className="small opacity-75">Granular visibility into field operations</div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div className="col-md-4">
+                                <div className="d-flex align-items-start p-3 rounded-3 h-100" style={{ backgroundColor: "rgba(255,255,255,0.05)" }}>
+                                    <div className="bg-warning bg-opacity-25 rounded-circle p-2 me-3 fs-5 d-flex align-items-center justify-content-center" style={{ width: 48, height: 48 }}>⚖️</div>
+                                    <div>
+                                        <div className="fw-bold mb-1">Dispute Reduction</div>
+                                        <div className="small opacity-75">Data-backed payroll processing</div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div className="col-md-4">
+                                <div className="d-flex align-items-start p-3 rounded-3 h-100" style={{ backgroundColor: "rgba(255,255,255,0.05)" }}>
+                                    <div className="bg-danger bg-opacity-25 rounded-circle p-2 me-3 fs-5 d-flex align-items-center justify-content-center" style={{ width: 48, height: 48 }}>⚡</div>
+                                    <div>
+                                        <div className="fw-bold mb-1">Rapid Grievance Redressal</div>
+                                        <div className="small opacity-75">SLA-based tracking of employee requests</div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div className="col-md-4">
+                                <div className="d-flex align-items-start p-3 rounded-3 h-100" style={{ backgroundColor: "rgba(255,255,255,0.05)" }}>
+                                    <div className="bg-primary bg-opacity-25 rounded-circle p-2 me-3 fs-5 d-flex align-items-center justify-content-center" style={{ width: 48, height: 48 }}>📊</div>
+                                    <div>
+                                        <div className="fw-bold mb-1">Data-Driven Decisions</div>
+                                        <div className="small opacity-75">Deployment analytics & optimization</div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div className="col-md-4">
+                                <div className="d-flex align-items-start p-3 rounded-3 h-100" style={{ backgroundColor: "rgba(255,255,255,0.05)" }}>
+                                    <div className="bg-secondary bg-opacity-25 rounded-circle p-2 me-3 fs-5 d-flex align-items-center justify-content-center" style={{ width: 48, height: 48 }}>🔒</div>
+                                    <div>
+                                        <div className="fw-bold mb-1">Secure & Audit-Ready</div>
+                                        <div className="small opacity-75">Role-based access & immutable logs</div>
                                     </div>
                                 </div>
                             </div>

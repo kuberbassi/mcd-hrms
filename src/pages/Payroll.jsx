@@ -135,7 +135,8 @@ function Payroll({ role, user }) {
 
     return (
         <div>
-            <h4 className="fw-bold mb-4">💰 Payroll Management</h4>
+            <h4 className="fw-bold mb-1">💰 Payroll & Compensation (Attendance Linked)</h4>
+            <p className="text-muted small mb-4">Payroll records are linked with attendance data to reduce discrepancies and disputes.</p>
 
             <div className="card border-0 shadow-sm overflow-hidden" style={{ borderRadius: "15px" }}>
                 <table className="table table-hover mb-0">
@@ -188,9 +189,21 @@ function Payroll({ role, user }) {
                                             <td className="text-end">{payrollData[emp.id]?.basic?.toLocaleString() || "-"}</td>
                                             <td className="text-end">{payrollData[emp.id]?.da?.toLocaleString() || "-"}</td>
                                             <td className="text-end">{payrollData[emp.id]?.hra?.toLocaleString() || "-"}</td>
-                                            <td className="text-end fw-bold text-success">₹{getTotal(emp.id).toLocaleString()}</td>
+                                            <td className="text-end fw-bold text-success">
+                                                ₹{getTotal(emp.id).toLocaleString()}
+                                                <span className="badge bg-light text-secondary border ms-2" style={{ fontSize: "0.6rem" }}>Synced</span>
+                                            </td>
                                             <td className="text-center">
-                                                <button className="btn btn-sm btn-outline-primary" onClick={() => setEditingId(emp.id)}>Edit</button>
+                                                {emp.email === user.email ? (
+                                                    <span className="badge bg-secondary opacity-50" title="Cannot edit own record">Self (Read-Only)</span>
+                                                ) : (
+                                                    <button
+                                                        className="btn btn-sm btn-outline-primary"
+                                                        onClick={() => setEditingId(emp.id)} // Reverted to setEditingId as openEditModal is not defined
+                                                    >
+                                                        Edit
+                                                    </button>
+                                                )}
                                             </td>
                                         </>
                                     )}

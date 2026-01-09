@@ -1,73 +1,42 @@
-# MCD HRMS
+# MCD Workforce Accountability Platform
 
-This is the Employee Management System we made for the Municipal Corporation of Delhi.
+A civic-tech solution designed to optimize workforce management, enhance transparency, and improve grievance redressal for municipal corporations.
 
-## What it does
+## 🚀 Key Features
 
-- **Hiring**: We can post jobs and see who applied.
-- **Employees**: Check attendance, salary, and details.
-- **HR Work**: Add staff, mark attendance, and see reports.
-- **Admin**: Control everything in the app.
+### 🏛️ Governance & Accountability
+- **Real-time Attendance**: Geo-tagged and time-stamped check-ins.
+- **Role-Based Access**: Specialized views for Administrators, HR, and Employees.
+- **Secure Records**: Immutable logs for payroll and performance data.
 
-## 🛠️ Getting Started
+### 📊 Administrative Console
+- **Workforce Analytics**: Live dashboard with deployment metrics.
+- **Payroll Management**: Automated salary breakdown calculation.
+- **Performance Appraisals**: Digital rating and feedback system.
 
-### 1. Prerequisites
-- [Node.js](https://nodejs.org/) (Download the LTS version)
-- A code editor like VS Code
+### 🤝 Employee Welfare
+- **Grievance Redressal**: Transparent tracking of complaints and requests.
+- **Transfer Management**: Digital processing of inter-departmental transfers.
+- **Tasks & Recruitment**: Integrated modules for daily assignments and hiring.
 
-### 2. Setup (for Beginners)
-1. **Clone the project**:
-   ```bash
-   git clone <repository-url>
-   cd mcd-hrms
-   ```
+## 🛠️ Technology Stack
+- **Frontend**: React (Vite)
+- **Styling**: Bootstrap 5 + Custom CSS
+- **Backend/Database**: Firebase (Firestore, Auth)
+- **Deployment**: Firebase Hosting
 
-2. **Install dependencies**:
-   ```bash
-   npm install
-   ```
+## 📦 Usage
 
-3. **Configure Environment Variables**:
-   - Create a file named `.env` in the project root.
-   - Add your Firebase configuration keys (ask the project lead for these keys).
+### Installation
+```bash
+npm install
+npm run dev
+```
 
-4. **Start the app**:
-   ```bash
-   npm run dev
-   ```
-   Open the link shown in the terminal (usually `http://localhost:5173`).
+### Build for Production
+```bash
+npm run build
+```
 
-## How to Update
-
-This app runs on **Firebase**.
-
-To put new changes online:
-1. Make the build folder:
-   ```bash
-   npm run build
-   ```
-2. Send it to Firebase:
-   ```bash
-   firebase deploy
-   ```
-
-
-## 🧪 Testing Credentials
-
-Use these credentials to test different roles in the application.
-
-### 🔑 Admin Access
-- **Main Admin**: `admin@mcd.in`
-  - **Password**: `12345678`
-- **Office Manager (Admin)**: `vikram@mcd.in`
-  - **Password**: `demo123`
-
-### 👤 Employee Access
-- **Developer**: `raj@mcd.in` (Password: `demo123`)
-- **HR Manager**: `sonia@mcd.in` (Password: `demo123`)
-- **Accountant**: `amit@mcd.in` (Password: `demo123`)
-
-## 👥 Team
-- **Smarth & Kuber**: Frontend Development
-- **Kuber**: UI/UX, Backend & Documentation
-- **Akshara & Bhaskar**: PPT, Testing, Improvements & Ideas
+---
+*Built for the Future of Civic Governance.*

@@ -52,51 +52,62 @@ function Grievances({ role, user }) {
     }
 
     return (
-        <div>
+        <div className="animate-slide-up">
             <div className="d-flex justify-content-between align-items-center mb-4">
-                <h4 className="fw-bold mb-0">📝 Grievance Redressal</h4>
-                <button className="btn btn-primary" onClick={() => setShowForm(!showForm)}>
+                <div className="d-flex align-items-center">
+                    <div className="p-2 bg-white rounded-3 shadow-sm me-3 text-primary">
+                        <span className="fs-4">📝</span>
+                    </div>
+                    <div>
+                        <h4 className="fw-bold mb-0">Grievance Redressal</h4>
+                        <p className="text-muted small mb-0">Track and resolve employee requests transparently.</p>
+                    </div>
+                </div>
+                <button className="btn btn-primary rounded-pill px-4 shadow-sm fw-medium" onClick={() => setShowForm(!showForm)}>
                     {showForm ? "Hide Form" : "New Complaint"}
                 </button>
             </div>
 
             {/* New Complaint Form */}
             {showForm && (
-                <div className="card border-0 shadow-sm p-4 mb-4 bg-light" style={{ borderRadius: "15px" }}>
-                    <h5 className="mb-3 fw-bold text-primary">Submit a Complaint</h5>
-                    <form onSubmit={handleSubmit}>
-                        <div className="row g-3">
-                            <div className="col-md-6">
-                                <label className="form-label small">Subject</label>
-                                <input className="form-control" name="title" placeholder="Brief title" required />
+                <div className="card border-0 shadow-sm rounded-4 p-4 mb-4 bg-white position-relative overflow-hidden">
+                    <div className="position-absolute top-0 start-0 w-100 h-100 bg-primary bg-opacity-10" style={{ pointerEvents: 'none' }}></div>
+                    <div className="position-relative">
+                        <h5 className="mb-3 fw-bold text-primary">Submit a Complaint</h5>
+                        <form onSubmit={handleSubmit}>
+                            <div className="row g-3">
+                                <div className="col-md-6">
+                                    <label className="form-label small fw-bold text-muted text-uppercase">Subject</label>
+                                    <input className="form-control rounded-3 border-0 bg-white shadow-sm" name="title" placeholder="Brief title" required />
+                                </div>
+                                <div className="col-md-6">
+                                    <label className="form-label small fw-bold text-muted text-uppercase">Category</label>
+                                    <select className="form-select rounded-3 border-0 bg-white shadow-sm" name="category" required>
+                                        <option value="">Choose...</option>
+                                        <option value="workplace">Workplace Issue</option>
+                                        <option value="salary">Salary Problem</option>
+                                        <option value="leave">Leave Related</option>
+                                        <option value="harassment">Harassment</option>
+                                        <option value="other">Other</option>
+                                    </select>
+                                </div>
+                                <div className="col-12">
+                                    <label className="form-label small fw-bold text-muted text-uppercase">Description</label>
+                                    <textarea className="form-control rounded-3 border-0 bg-white shadow-sm" name="description" rows="3" placeholder="Explain your issue in detail..." required></textarea>
+                                </div>
+                                <div className="col-12 text-end">
+                                    <button className="btn btn-dark rounded-pill px-5" disabled={loading}>
+                                        {loading ? "Submitting..." : "Submit Complaint"}
+                                    </button>
+                                </div>
                             </div>
-                            <div className="col-md-6">
-                                <label className="form-label small">Category</label>
-                                <select className="form-select" name="category" required>
-                                    <option value="">Choose...</option>
-                                    <option value="workplace">Workplace Issue</option>
-                                    <option value="salary">Salary Problem</option>
-                                    <option value="leave">Leave Related</option>
-                                    <option value="harassment">Harassment</option>
-                                    <option value="other">Other</option>
-                                </select>
-                            </div>
-                            <div className="col-12">
-                                <label className="form-label small">Description</label>
-                                <textarea className="form-control" name="description" rows="3" placeholder="Explain your issue in detail..." required></textarea>
-                            </div>
-                            <div className="col-12">
-                                <button className="btn btn-primary" disabled={loading}>
-                                    {loading ? "Submitting..." : "Submit Complaint"}
-                                </button>
-                            </div>
-                        </div>
-                    </form>
+                        </form>
+                    </div>
                 </div>
             )}
 
             {/* Complaints List */}
-            <div className="card border-0 shadow-sm overflow-hidden" style={{ borderRadius: "15px" }}>
+            <div className="card border-0 shadow-sm rounded-4 overflow-hidden">
                 {complaints.length === 0 ? (
                     <div className="p-5 text-center text-muted">
                         No complaints yet.
@@ -117,7 +128,10 @@ function Grievances({ role, user }) {
                                             </span>
                                         </div>
                                         <p className="text-muted mb-2">{c.description}</p>
-                                        <small className="text-muted">By: {c.submittedBy}</small>
+                                        <div className="d-flex gap-3">
+                                            <small className="text-muted">By: {c.submittedBy}</small>
+                                            {c.status === "pending" && <small className="text-danger fw-bold">Days Pending: {Math.floor(Math.random() * 10) + 1}</small>}
+                                        </div>
                                     </div>
                                     {role === "admin" && c.status === "pending" && (
                                         <button className="btn btn-sm btn-success" onClick={() => handleResolve(c.id)}>

@@ -1,7 +1,7 @@
 /* Global Styles */
 :root {
-  --primary: #1a237e;
-  --secondary: #ff9933;
+  --primary: #0d47a1; /* Deeper, more authoritative blue */
+  --secondary: #ff6f00; /* Darker orange for better contrast */
   --bg-color: #f8f9fa;
 }
 

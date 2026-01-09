@@ -1,24 +1,24 @@
 import React, { useState, useEffect } from 'react';
-import { 
-    assignTask, 
-    getAllTasks, 
-    getEmployeeTasks, 
+import {
+    assignTask,
+    getAllTasks,
+    getEmployeeTasks,
     updateTaskStatus
 } from '../backend';
-import { collection, getDocs } from 'firebase/firestore'; 
+import { collection, getDocs } from 'firebase/firestore';
 import { db } from '../firebase';
 
 const Tasks = ({ user, role }) => {
     const [loading, setLoading] = useState(true);
     const [tasks, setTasks] = useState([]);
     const [employees, setEmployees] = useState([]);
-    
+
     // UI State
     const [showModal, setShowModal] = useState(false);
     const [submitting, setSubmitting] = useState(false);
-    const [successMessage, setSuccessMessage] = useState(""); 
+    const [successMessage, setSuccessMessage] = useState("");
     const [errorMessage, setErrorMessage] = useState("");
-    
+
     // Form State
     const [newTask, setNewTask] = useState({
         title: '',
@@ -34,11 +34,11 @@ const Tasks = ({ user, role }) => {
     const totalTasks = tasks.length;
     const completedTasks = tasks.filter(t => t.status === 'Completed').length;
     // 'Pending' here means anything not completed (so it includes "In Progress")
-    const pendingTasks = totalTasks - completedTasks; 
+    const pendingTasks = totalTasks - completedTasks;
 
     useEffect(() => {
         const initData = async () => {
-            if (!user) return; 
+            if (!user) return;
 
             try {
                 if (isAdmin) {
@@ -66,7 +66,7 @@ const Tasks = ({ user, role }) => {
             assignedTo: employee.email,
             employeeName: employee.name
         });
-        setSuccessMessage(""); 
+        setSuccessMessage("");
         setErrorMessage("");
         setShowModal(true);
     };
@@ -74,7 +74,7 @@ const Tasks = ({ user, role }) => {
     const handleAssign = async (e) => {
         e.preventDefault();
         setErrorMessage("");
-        
+
         if (!newTask.title || !newTask.dueDate) {
             setErrorMessage("Please fill in the Task Title and Due Date.");
             return;
@@ -85,13 +85,13 @@ const Tasks = ({ user, role }) => {
         try {
             const result = await assignTask({
                 ...newTask,
-                assignedBy: user.email, 
+                assignedBy: user.email,
             });
 
             if (result.success) {
-                setShowModal(false); 
+                setShowModal(false);
                 setSuccessMessage(`✅ Task successfully assigned to ${newTask.employeeName}!`);
-                
+
                 const updatedTasks = await getAllTasks();
                 setTasks(updatedTasks);
 
@@ -127,7 +127,8 @@ const Tasks = ({ user, role }) => {
 
     return (
         <div className="container py-4">
-            <h2 className="mb-4 pb-2 border-bottom text-dark">Task Management</h2>
+            <h2 className="mb-1 text-dark">Daily Workforce Deployment</h2>
+            <p className="text-muted border-bottom pb-3">Allocate daily duties and field deployments to staff across departments and wards.</p>
 
             {/* --- NEW SECTION: Status Dashboard --- */}
             <div className="row g-3 mb-4">
@@ -146,7 +147,7 @@ const Tasks = ({ user, role }) => {
                     <div className="card border-0 shadow-sm bg-warning text-dark h-100">
                         <div className="card-body d-flex justify-content-between align-items-center">
                             <div>
-                                <h6 className="text-uppercase mb-1 opacity-75 small fw-bold">Pending / Active</h6>
+                                <h6 className="text-uppercase mb-1 opacity-75 small fw-bold">Active Deployments</h6>
                                 <h2 className="mb-0 fw-bold">{pendingTasks}</h2>
                             </div>
                             <div className="fs-1 opacity-50">⏳</div>
@@ -185,12 +186,12 @@ const Tasks = ({ user, role }) => {
                                         <h5 className="card-title fw-bold text-dark">{emp.name}</h5>
                                         <p className="card-text text-muted small mb-1">{emp.post} • {emp.dept}</p>
                                         <p className="card-text text-muted small mb-3">{emp.email}</p>
-                                        
-                                        <button 
+
+                                        <button
                                             onClick={() => openAssignModal(emp)}
                                             className="btn btn-primary mt-auto w-100 fw-bold"
                                         >
-                                            + Assign Task
+                                            + Deploy Staff
                                         </button>
                                     </div>
                                 </div>
@@ -208,9 +209,9 @@ const Tasks = ({ user, role }) => {
                                         <div>
                                             <h5 className="fw-bold text-dark mb-1">{task.title}</h5>
                                             <p className="text-muted small mb-2">
-                                                To: <span className="fw-bold text-primary">{task.employeeName}</span> 
-                                                <span className="mx-2">|</span> 
-                                                <span className="text-danger fw-bold">Due: {formatDeadline(task.dueDate)}</span>
+                                                Deployed To: <span className="fw-bold text-primary">{task.employeeName}</span>
+                                                <span className="mx-2">|</span>
+                                                <span className="text-danger fw-bold">Report By: {formatDeadline(task.dueDate)}</span>
                                             </p>
                                             <p className="text-secondary mb-1">{task.description}</p>
                                             {task.employeeNotes && (
@@ -220,10 +221,9 @@ const Tasks = ({ user, role }) => {
                                             )}
                                         </div>
                                         <div>
-                                            <span className={`badge rounded-pill ${
-                                                task.status === 'Completed' ? 'bg-success' : 
-                                                task.status === 'In Progress' ? 'bg-warning text-dark' : 'bg-secondary'
-                                            }`}>
+                                            <span className={`badge rounded-pill ${task.status === 'Completed' ? 'bg-success' :
+                                                    task.status === 'In Progress' ? 'bg-warning text-dark' : 'bg-secondary'
+                                                }`}>
                                                 {task.status}
                                             </span>
                                         </div>
@@ -240,12 +240,12 @@ const Tasks = ({ user, role }) => {
                                 <div className="modal-dialog modal-dialog-centered">
                                     <div className="modal-content shadow-lg border-0">
                                         <div className="modal-header bg-primary text-white">
-                                            <h5 className="modal-title fw-bold">Assign Task</h5>
+                                            <h5 className="modal-title fw-bold">Deploy Worker</h5>
                                             <button type="button" className="btn-close btn-close-white" onClick={() => setShowModal(false)}></button>
                                         </div>
                                         <div className="modal-body p-4">
                                             <p className="text-muted mb-3">
-                                                Assigning to: <strong className="text-dark">{newTask.employeeName}</strong>
+                                                Deploying: <strong className="text-dark">{newTask.employeeName}</strong>
                                             </p>
 
                                             {errorMessage && (
@@ -253,37 +253,37 @@ const Tasks = ({ user, role }) => {
                                                     {errorMessage}
                                                 </div>
                                             )}
-                                            
+
                                             <form onSubmit={handleAssign}>
                                                 <div className="mb-3">
-                                                    <label className="form-label fw-bold small text-muted">Task Title</label>
-                                                    <input 
-                                                        type="text" 
+                                                    <label className="form-label fw-bold small text-muted">Deployment Title / Duty</label>
+                                                    <input
+                                                        type="text"
                                                         className="form-control"
                                                         value={newTask.title}
-                                                        onChange={e => setNewTask({...newTask, title: e.target.value})}
-                                                        required 
+                                                        onChange={e => setNewTask({ ...newTask, title: e.target.value })}
+                                                        required
                                                         autoFocus
                                                         placeholder="Enter task name..."
                                                     />
                                                 </div>
                                                 <div className="mb-3">
-                                                    <label className="form-label fw-bold small text-muted">Due Date & Time</label>
-                                                    <input 
-                                                        type="datetime-local" 
+                                                    <label className="form-label fw-bold small text-muted">Reporting Time</label>
+                                                    <input
+                                                        type="datetime-local"
                                                         className="form-control"
                                                         value={newTask.dueDate}
-                                                        onChange={e => setNewTask({...newTask, dueDate: e.target.value})}
-                                                        required 
+                                                        onChange={e => setNewTask({ ...newTask, dueDate: e.target.value })}
+                                                        required
                                                     />
                                                 </div>
                                                 <div className="mb-4">
-                                                    <label className="form-label fw-bold small text-muted">Description</label>
-                                                    <textarea 
+                                                    <label className="form-label fw-bold small text-muted">Deployment Instructions</label>
+                                                    <textarea
                                                         className="form-control"
                                                         rows="3"
                                                         value={newTask.description}
-                                                        onChange={e => setNewTask({...newTask, description: e.target.value})}
+                                                        onChange={e => setNewTask({ ...newTask, description: e.target.value })}
                                                         placeholder="Enter task details..."
                                                     ></textarea>
                                                 </div>
@@ -292,7 +292,7 @@ const Tasks = ({ user, role }) => {
                                                         {submitting ? (
                                                             <span><span className="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>Assigning...</span>
                                                         ) : (
-                                                            "Confirm Assignment"
+                                                            "Confirm Deployment"
                                                         )}
                                                     </button>
                                                     <button type="button" className="btn btn-light text-muted" onClick={() => setShowModal(false)} disabled={submitting}>Cancel</button>
@@ -319,10 +319,9 @@ const Tasks = ({ user, role }) => {
                                 <div key={task.id} className="card shadow-sm border-0">
                                     <div className="card-header bg-white border-bottom-0 pt-4 pb-0 d-flex justify-content-between align-items-center">
                                         <h5 className="fw-bold text-dark mb-0">{task.title}</h5>
-                                        <span className={`badge rounded-pill ${
-                                            task.status === 'Completed' ? 'bg-success' : 
-                                            task.status === 'In Progress' ? 'bg-warning text-dark' : 'bg-secondary'
-                                        }`}>
+                                        <span className={`badge rounded-pill ${task.status === 'Completed' ? 'bg-success' :
+                                                task.status === 'In Progress' ? 'bg-warning text-dark' : 'bg-secondary'
+                                            }`}>
                                             {task.status}
                                         </span>
                                     </div>
@@ -330,11 +329,11 @@ const Tasks = ({ user, role }) => {
                                         <p className="small text-muted mb-3">
                                             From Admin ({task.assignedBy})
                                         </p>
-                                        
+
                                         <div className="alert alert-danger py-2 px-3 d-inline-block small fw-bold mb-3">
                                             ⏰ Due: {formatDeadline(task.dueDate)}
                                         </div>
-                                        
+
                                         <div className="bg-light p-3 rounded mb-4 border">
                                             <label className="small fw-bold text-uppercase text-muted d-block mb-1">Description</label>
                                             <p className="mb-0 text-dark">{task.description}</p>
@@ -348,14 +347,14 @@ const Tasks = ({ user, role }) => {
                                         )}
 
                                         <div className="d-flex gap-2 border-top pt-3">
-                                            <button 
+                                            <button
                                                 onClick={() => handleUpdate(task.id, 'In Progress', task.employeeNotes)}
                                                 disabled={task.status === 'Completed'}
                                                 className="btn btn-outline-warning flex-fill fw-bold text-dark"
                                             >
                                                 In Progress
                                             </button>
-                                            <button 
+                                            <button
                                                 onClick={() => handleUpdate(task.id, 'Completed', task.employeeNotes)}
                                                 disabled={task.status === 'Completed'}
                                                 className="btn btn-success flex-fill fw-bold text-white"

@@ -179,7 +179,7 @@ function App() {
                 <div className="card-body p-4 p-md-5">
                   <div className="text-center mb-4">
                     <div className="bg-primary text-white rounded-circle d-inline-flex align-items-center justify-content-center mb-3" style={{ width: "60px", height: "60px", fontSize: "1.5rem" }}>M</div>
-                    <h4 className="fw-bold mb-1">MCD HRMS</h4>
+                    <h4 className="fw-bold mb-1">MCD Workforce Accountability</h4>
                     <p className="text-muted small mb-0">Municipal Corporation of Delhi</p>
                   </div>
                   <form onSubmit={handleLogin}>
@@ -296,7 +296,7 @@ function App() {
               <line x1="3" y1="18" x2="21" y2="18"></line>
             </svg>
           </button>
-          <span className="navbar-brand mb-0 fw-bold">MCD HRMS</span>
+          <span className="navbar-brand mb-0 fw-bold">MCD Workforce Accountability</span>
           <button className="btn btn-sm btn-outline-light border-0" onClick={handleLogout}>
             <svg width="18" height="18" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
               <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
@@ -361,7 +361,7 @@ function App() {
               <span className="fw-bold" style={{ color: THEME.primary }}>M</span>
             </div>
             <div>
-              <div style={{ lineHeight: "1", fontSize: "1.2rem" }}>MCD HRMS</div>
+              <div style={{ lineHeight: "1", fontSize: "1.2rem" }}>MCD Workforce Accountability</div>
               <div style={{ lineHeight: "1", fontSize: "0.65rem", opacity: 0.8, letterSpacing: "1px", textTransform: "uppercase" }}>Municipal Corporation of Delhi</div>
             </div>
           </span>

@@ -48,7 +48,7 @@ export default function JobPostings() {
 
     return (
         <div className="container-fluid">
-            <div className="d-flex justify-content-between align-items-center mb-4">
+            <div className="d-flex justify-content-between align-items-center mb-1">
                 <h2 className="mb-0 fw-bold">Job Postings</h2>
                 <button
                     className="btn btn-primary"
@@ -56,6 +56,9 @@ export default function JobPostings() {
                 >
                     {showForm ? "Cancel" : "+ Post New Job"}
                 </button>
+            </div>
+            <div className="alert alert-info py-2 small mb-4">
+                ℹ️ This module is designed for contractual and temporary workforce hiring and is integration-ready with existing government recruitment systems.
             </div>
 
             {showForm && (

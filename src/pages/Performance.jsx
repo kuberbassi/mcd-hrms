@@ -129,13 +129,19 @@ function Performance({ role, user }) {
                     )}
 
                     {isManagementView && (
-                        <button
-                            className="btn btn-outline-primary w-100 rounded-pill fw-medium btn-sm opacity-0 group-hover-opacity-100 transition-all"
-                            onClick={() => openEdit(emp)}
-                            style={{ opacity: rData.rating ? 0.8 : 1 }}
-                        >
-                            {rData.rating ? "Update Review" : "Write Review"}
-                        </button>
+                        emp.email === user.email ? (
+                            <div className="text-center py-1">
+                                <span className="badge bg-secondary opacity-50 rounded-pill px-3">Self (Read-Only)</span>
+                            </div>
+                        ) : (
+                            <button
+                                className="btn btn-outline-primary w-100 rounded-pill fw-medium btn-sm opacity-0 group-hover-opacity-100 transition-all"
+                                onClick={() => openEdit(emp)}
+                                style={{ opacity: rData.rating ? 0.8 : 1 }}
+                            >
+                                {rData.rating ? "Update Review" : "Write Review"}
+                            </button>
+                        )
                     )}
                 </div>
                 <div className={`h-1 w-100 ${rData.rating >= 4 ? "bg-success" : rData.rating >= 3 ? "bg-primary" : rData.rating ? "bg-warning" : "bg-light"}`}></div>
@@ -147,8 +153,8 @@ function Performance({ role, user }) {
         <div className="animate-fade-in">
             <div className="d-flex justify-content-between align-items-center mb-4">
                 <div>
-                    <h4 className="fw-bold mb-1">Performance Reviews</h4>
-                    <p className="text-muted small mb-0">Track and evaluate employee performance.</p>
+                    <h4 className="fw-bold mb-1">Performance Indicators</h4>
+                    <p className="text-muted small mb-0">Indicators derived from measurable attendance, deployment, and task completion records.</p>
                 </div>
             </div>
 
@@ -201,6 +207,7 @@ function Performance({ role, user }) {
                                     value={editComment}
                                     onChange={(e) => setEditComment(e.target.value)}
                                     style={{ resize: "none" }}
+                                    disabled={editingEmp.email === user.email} // Disable if employee is current user
                                 />
                             </div>
 
